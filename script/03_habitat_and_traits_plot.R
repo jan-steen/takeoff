@@ -195,7 +195,7 @@ treemap(tree,
 ### die treemap funktioniert nicht als plot objekt...
 hab | eur
 
-ggsave("figures/habitats.pdf", width = 18, height = 10, units = "cm")
+#ggsave("figures/habitats.pdf", width = 18, height = 10, units = "cm")
 
 
 

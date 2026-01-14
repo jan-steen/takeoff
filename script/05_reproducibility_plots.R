@@ -75,7 +75,7 @@ dat <- ggplot(meta[!(is.na(meta$Data_available)),], aes(x= Data_available))+
 
 (ana | pho )/( dat | scr)
 
-ggsave("figures/reproducibility.pdf", width = 14, height = 12, units = "cm")
+#ggsave("figures/reproducibility.pdf", width = 14, height = 12, units = "cm")
 
 ################################################################################
 
