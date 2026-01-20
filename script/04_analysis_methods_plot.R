@@ -72,76 +72,16 @@ combi$Sensor <- factor(combi$Sensor,
 ##
 table(combi$algorithm_grouped)
 
-
-### rename algorithms
-combi$algorithm_grouped <- case_when(
-  combi$algorithm_grouped == "linear" ~ "linear regression",
-  combi$algorithm_grouped == "Non-linear" ~ "non-linear regression",
-  combi$algorithm_grouped == "tree" ~ "tree based machine learning",
-  combi$algorithm_grouped == "svm" ~ "support vector machine",
-  combi$algorithm_grouped == "dlnn" ~ "deep learning neural network",
-  combi$algorithm_grouped == "nn" ~ "simple neural network",
-  combi$algorithm_grouped == "unsupervised" ~ "unsupervised machine learning",
-  combi$algorithm_grouped == "missing" ~ "missing",
-  TRUE ~ "other"
-)
-
-
-combi$algorithm_grouped <- factor(combi$algorithm_grouped,
-                                  levels = c("missing","other","unsupervised machine learning",
-                                             "simple neural network","deep learning neural network",
-                                             "support vector machine","tree based machine learning",
-                                             "non-linear regression","linear regression"))
-
-combi$Habitat_quality_grouped <- factor(combi$Habitat_quality_grouped,
-                                        levels = c("Biomass", "Biogeochemical", "Land Cover", "Species detection", "Other"))
-
-
-table(combi$Sensor)
-table(combi$algorithm_grouped)
-
-######################################################
-
-combi |>
-  select(Habitat_quality_grouped, Sensor, algorithm_grouped) |>
-  count(Sensor, algorithm_grouped, Habitat_quality_grouped) |>
-  filter(Habitat_quality_grouped %in% c("Biogeochemical", "Biomass", "Land Cover", "Species detection"))  |>
-  filter(Sensor %in% c("RGB", "multispectral", "hyperspectral", "LiDAR", "other")) |>
-  filter(algorithm_grouped %in% c("unsupervised machine learning",
-                                  "simple neural network","deep learning neural network",
-                                  "support vector machine","tree based machine learning",
-                                  "non-linear regression","linear regression")) |>
-  mutate(n = cut(n, breaks = c(1,3,5,10,15,20,50), right = F)) |>
-ggplot(aes(x = Sensor, y = algorithm_grouped, fill = n)) + 
-  geom_tile() +
-  facet_wrap(vars(Habitat_quality_grouped), 
-             labeller = labeller(Habitat_quality_grouped = habitats))+
- # scale_fill_gradient(low = "#fef0d9", high = "#cb181d") + ### if gradient scale should be used
-  scale_fill_viridis(discrete = T, option = "G", direction = -1) +
-  labs(x = "", y = "", fill = "occurences")+
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 60, hjust = 1))
-
-
-#ggsave("figures/analysis.pdf", width = 12, height = 10, units = "cm")
-
-#######################################################
-
-
-
 ## zweite version mit etwas gröberer Gruppierung
 ## vor zeile 77 gleich
 
-##
-table(combi$algorithm_grouped)
-
 
 ### rename algorithms
 combi$algorithm_grouped <- case_when(
-  combi$algorithm_grouped %in% c("linear", "Non-linear") ~ "regression analysis",
+  combi$algorithm_grouped %in% c("linear", "Non-linear") ~ "parametric statistical analysis",
   combi$algorithm_grouped == "tree" ~ "tree based machine learning",
   combi$algorithm_grouped == "svm" ~ "support vector machine",
-  combi$algorithm_grouped %in% c("nn", "dlnn") ~ "neural network",
+  combi$algorithm_grouped %in% c("nn", "dlnn") ~ "deep neural network",
   combi$algorithm_grouped == "unsupervised" ~ "unsupervised machine learning",
   combi$algorithm_grouped == "missing" ~ "missing",
   TRUE ~ "other"
@@ -150,11 +90,11 @@ combi$algorithm_grouped <- case_when(
 
 combi$algorithm_grouped <- factor(combi$algorithm_grouped,
                                   levels = c("missing","other",
-                                             "neural network",
-                                             "support vector machine",
                                              "unsupervised machine learning",
+                                             "deep neural network",
+                                             "support vector machine",
                                              "tree based machine learning",
-                                             "regression analysis"))
+                                             "parametric statistical analysis"))
 
 combi$Habitat_quality_grouped <- factor(combi$Habitat_quality_grouped,
                                         levels = c("Biomass", "Biogeochemical", "Land Cover", "Species detection", "Other"))
@@ -170,25 +110,24 @@ test <- combi |>
   count(Sensor, algorithm_grouped, Habitat_quality_grouped) |>
   filter(Habitat_quality_grouped %in% c("Biogeochemical", "Biomass", "Land Cover", "Species detection"))  |>
   filter(Sensor %in% c("RGB", "multispectral", "hyperspectral", "LiDAR", "other")) |>
-  filter(algorithm_grouped %in% c("neural network",
+  filter(algorithm_grouped %in% c("deep neural network",
                                   "support vector machine",
                                   "unsupervised machine learning",
                                   "tree based machine learning",
-                                  "regression analysis")) |>
-  mutate(n = cut(n, breaks = c(1,3,5,10,15,20,50), right = F))
+                                  "parametric statistical analysis")) |>
+  mutate(n = cut(n, breaks = c(1,5,10,15,20,50), right = F))
 
 test$n <- case_when(
-  test$n == "[1,3)" ~ "1-2",
-  test$n == "[3,5)" ~ "3-4",
+  test$n == "[1,5)" ~ "1-4",
   test$n == "[5,10)" ~ "5-9",
   test$n == "[10,15)" ~ "10-14",
   test$n == "[15,20)" ~ "15-19",
-  test$n == "[20,50)" ~ "20-50",
+  test$n == "[20,50)" ~ "> 20",
   TRUE ~ "other"
 )
 test
 test$n <- factor(test$n,
-                 levels = c("1-2", "3-4","5-9","10-14","15-19","20-50"))
+                 levels = c("1-4","5-9","10-14","15-19","> 20"))
 
 ### define labels with number of observations for the habitat facets
 habitats <- c(
@@ -208,7 +147,8 @@ ggplot(data = test, aes(x = Sensor, y = algorithm_grouped, fill = n)) +
   scale_fill_viridis(discrete = T, option = "G", direction = -1) +
   labs(x = "", y = "", fill = "occurences")+
   theme_minimal()+
-  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+  theme(axis.text.x = element_text(angle = 60, hjust = 1),
+        panel.grid.major = element_blank())
 
 
 

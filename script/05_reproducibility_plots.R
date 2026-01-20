@@ -49,27 +49,27 @@ meta$Script_available <- factor(meta$Script_available,
 
 ana <- ggplot(data[!(is.na(data$Analysis_open_source)),], aes(x= Analysis_open_source))+
   geom_bar(width = 0.6)+
-  theme_minimal()+
+  theme_classic() +
   labs(x = "Analysis open source", y = "Number of observations")+
-  ylim(0,300)
+  scale_y_continuous(expand = c(0,0), limits = c(0,300))
 
 pho <- ggplot(data[!(is.na(data$Photogrammetry_open_source)),], aes(x= Photogrammetry_open_source))+
   geom_bar(width = 0.6)+
-  theme_minimal()+
+  theme_classic() +
   labs(x = "Photogrammetry open source", y = "")+
-  ylim(0,300)
+  scale_y_continuous(expand = c(0,0), limits = c(0,300))
 
 scr <- ggplot(meta[!(is.na(meta$Script_available)),], aes(x= Script_available))+
   geom_bar(width = 0.75)+
-  theme_minimal()+
+  theme_classic() +
   labs(x = "Script available", y = "")+
-  ylim(0,225)
+  scale_y_continuous(expand = c(0,0), limits = c(0,225))
 
 dat <- ggplot(meta[!(is.na(meta$Data_available)),], aes(x= Data_available))+
   geom_bar(width = 0.75)+
-  theme_minimal()+
+  theme_classic() +
   labs(x = "Data available", y = "Number of observations")+
-  ylim(0,225)
+  scale_y_continuous(expand = c(0,0), limits = c(0,225))
 
 ### try to make the width the same for all plots despite having 3 or 4 categories
 

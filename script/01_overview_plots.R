@@ -40,16 +40,11 @@ publ <- data |>
   filter(!(is.na(Protected_area))) |>
   left_join(meta, by = "DOI")
 
-pub <- ggplot(publ,aes(x = Year, fill = Protected_area) )+
+pub <- ggplot(publ[publ$Year!=2025,],aes(x = Year) )+
   geom_bar(width = 0.8)+
-  theme_minimal()+
-  ylab("Number of articles")+
-  xlab("Year of Publication")
-pub 
-
-pub <- ggplot(publ,aes(x = Year) )+
-  geom_bar(width = 0.8)+
-  theme_minimal()+
+  scale_x_continuous(breaks = c(2012,2015,2018,2021,2024)) +
+  scale_y_continuous(expand = c(0,0))+
+  theme_classic()+
   labs(x = "Year of publication", y = "Number of articles")
 pub 
 

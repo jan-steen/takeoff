@@ -76,7 +76,7 @@ bar <- ggplot(datbar, aes(x = "", fill = Sensor)) +
   geom_bar(position = "fill", width = 0.6, color = "white") +
   geom_text(
     stat = "count",
-    aes(label = after_stat(ifelse(count / sum(count) >= 0.06,
+    aes(label = after_stat(ifelse(count / sum(count) >= 0.13,
                                   scales::percent(count / sum(count), 0.1), ""))),
     position = position_fill(vjust = 0.5),
     size = 3, col = "white"
@@ -85,7 +85,7 @@ bar <- ggplot(datbar, aes(x = "", fill = Sensor)) +
   scale_fill_manual(values = pal) +
   theme_void() +
   theme(legend.position = "none")+
-  labs (subtitle = "      Overall usage of sensor types")
+  labs (subtitle = "    Overall usage of sensor types")
 
 bar
 ################################################################################
@@ -103,6 +103,9 @@ end_labels <- datlin |>
   slice_tail(n = 1) |>
   ungroup()
 
+datlin$Sensor <- factor(datlin$Sensor,
+                           levels = c("RGB", "multispectral", "hyperspectral", "LiDAR", "Other"))
+
 sen <- ggplot(datlin[datlin$Sensor != "missing",], aes(Year, n, color = Sensor)) +
   geom_line(linewidth = 1.5) +
   geom_text(
@@ -111,8 +114,9 @@ sen <- ggplot(datlin[datlin$Sensor != "missing",], aes(Year, n, color = Sensor))
     hjust = 0, nudge_x = 0.3, size = 3.5
   ) +
   scale_color_manual(values = pal) +
-  scale_x_continuous(breaks = c(2015,2020),expand = expansion(mult = c(0.01, 0.4))) +
-  theme_minimal() +
+  scale_x_continuous(breaks = c(2012,2015,2018,2021,2024),expand = expansion(mult = c(0.01, 0.4))) +
+  scale_y_continuous(expand = c(0,0))+
+  theme_classic() +
   theme(legend.position = "none") +
   labs(
   #  title = "Sensors used in UAS studies",
@@ -172,7 +176,7 @@ UASbar <- ggplot(datbar2, aes(x = "", fill = Drone_type)) +
   scale_fill_manual(values = pal2) +
   theme_void() +
   theme(legend.position = "none")+
-  labs (subtitle = "      Overall usage of UAS types")
+  labs (subtitle = "    Overall usage of UAS types")
 UASbar
 ######
 
@@ -189,11 +193,10 @@ end_labels <- datlin2 |>
   slice_tail(n = 1) |>
   ungroup()
 ## manually change the text label positions to better fit because text_repel does not work that good
-end_labels$Year <- c(2024, 2018, 2024, 2024, 2023)
-end_labels$n <- c(4,3.5,0,57,1)
+end_labels$Year <- c(2024, 2018, 2022, 2024, 2022)
+end_labels$n <- c(4,3.5,1,55.5,3)
 
 #table(data$Drone_type)
-
 dro <- ggplot(datlin2[datlin2$Drone_type != "missing" & datlin2$n != "0",], aes(Year, n, color = Drone_type)) +
   geom_line(linewidth = 1.5) +
   geom_text(
@@ -202,13 +205,14 @@ dro <- ggplot(datlin2[datlin2$Drone_type != "missing" & datlin2$n != "0",], aes(
     hjust = 0, nudge_x = 0.3, size = 3.5
   ) +
   scale_color_manual(values = pal2) +
-  scale_x_continuous(breaks = c(2015,2020),expand = expansion(mult = c(0.01, 0.35))) +
-  theme_minimal() +
+  scale_x_continuous(breaks = c(2012,2015,2018,2021,2024),expand = expansion(mult = c(0.01, 0.35))) +
+  scale_y_continuous(expand = c(0,0))+
+  theme_classic() +
   theme(legend.position = "none") +
   labs(
   #  title = "UAS type used",
   #  subtitle = "data missing = 15",
-    y = "Number of observations",
+    y = "",
     x = "Year of publication"
   )
 
@@ -260,7 +264,8 @@ pal3 <- c(
 
 man <- ggplot(data[!(is.na(data$drone_grouped)) & data$drone_grouped != "missing",], aes(x= drone_grouped, fill = DJI_model))+
   geom_bar(width = 0.8)+
-  theme_minimal()+
+  scale_y_continuous(expand = c(0,0))+
+  theme_classic() +
   #  coord_flip()+
   scale_fill_manual(breaks = c("Phantom", "Matrice", "Mavic", "Inspire", "Other"),
                     values = pal3)+

@@ -76,14 +76,14 @@ pal <- c(
 ### plot which habitat traits were assessed in which habitat type
 hab <- ggplot(habitat[habitat$Habitat_quality_grouped != "missing",],aes(x = Habitat_type, fill = Habitat_quality_grouped))+
   geom_bar(position = position_dodge2(preserve = "single"))+
-  theme_minimal()+
+  scale_y_continuous(expand = c(0,0))+
+  theme_classic() +
   labs(fill = "analysed trait", x = "Habitat type", y = "Number of observations")+
   scale_fill_manual(values = pal, guide = guide_legend(ncol = 2))+
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        legend.key.spacing.y = unit(0, "pt"))
 hab
 
-
-#ggsave("figures/habitat.pdfncol = #ggsave("figures/habitat.pdf", width = 14, height = 6, units = "cm")
 
 
 
@@ -141,9 +141,11 @@ pal3 <- c(
 eur <- ggplot(euro, aes(x = Habitat_type, fill = NATURA_2000))+
   geom_bar(width = 0.7)+
   labs(x = "Habitat type", y = "", fill = "NATURA 2000 area")+
-  theme_minimal()+
+  scale_y_continuous(expand = c(0,0))+
+  theme_classic() +
   scale_fill_manual(values = pal3, guide = guide_legend(ncol = 2, reverse = TRUE))+
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        legend.key.spacing.y = unit(0, "pt"))
 eur
 
 #ggsave("figures/NATURA2000.pdf", width = 12, height = 6, units = "cm")
