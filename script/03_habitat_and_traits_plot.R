@@ -85,8 +85,6 @@ hab <- ggplot(habitat[habitat$Habitat_quality_grouped != "missing",],aes(x = Hab
 hab
 
 
-
-
 ################################################################################
 
 ### how many studys are in NATURA 2000 areas?
@@ -200,8 +198,6 @@ hab | eur
 
 
 
-
-
 ### new natura 2000 stuff
 
 euro <- data |>
@@ -237,15 +233,30 @@ euro$Habitat_quality_grouped <- factor(euro$Habitat_quality_grouped,
                                           levels = c("Biomass", "Land Cover", "Species detection","Biogeochemical", "Other","missing"))
 
 
-eurobar <- ggplot(euro, aes(x = Habitat_type, fill = Habitat_quality_grouped))+
-  geom_bar(position = position_dodge2(preserve = "single"))+
-  scale_y_continuous(expand = c(0,0))+
+### gerade testweise implementiert, code muss noch umgestellt werden um es richtig
+### laufen zu lassen 
+test <- habitat |>
+  filter(Habitat_quality_grouped != "missing" & Habitat_type != "Other") |>
+  left_join(euro, by = "DOI")
+
+
+ggplot(test,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
+  geom_bar(position = position_stack(reverse = T), width = 0.8)+
+  facet_wrap(test$Habitat_type.x)+
+  scale_y_continuous(expand = c(0,0), limits = c(0,110))+
   theme_classic() +
-  labs(fill = "analysed trait", x = "inside NATURA 2000 areas", y = "Number of observations")+
-  scale_fill_manual(values = pal, guide = guide_legend(ncol = 2))+
-  theme(legend.position = "bottom",
-        legend.key.spacing.y = unit(0, "pt"))
-eurobar
+  labs(x = "", y = "Number of observations", fill = "NATURA 2000\nhabitat")+
+  theme(legend.position = "right",
+        legend.key.spacing.y = unit(0, "pt"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.background = element_rect(linewidth = 0.5))+
+  theme(panel.spacing = unit(1, "lines"))+
+  scale_fill_manual(
+    values = "indianred1",
+    breaks = c('yes'))
+## traits als facet und dann ihne farben und traits als balken
+
+#ggsave("figures/habitats.pdf", width = 18, height = 10, units = "cm")
 
 
 ################################################################################
@@ -286,24 +297,6 @@ treemap(eurotree,
         
 )
 
-################################################################################
-
-### heatmap of only NATURA 2000 studies
-library(viridis)
-
-test <- euro |>
-  select(Habitat_type, Habitat_quality_grouped) |>
-  count(Habitat_type, Habitat_quality_grouped) 
-
-
-ggplot(data = test, aes(x = Habitat_type, y = Habitat_quality_grouped, fill = n)) + 
-  geom_tile() +
-  # scale_fill_gradient(low = "#fef0d9", high = "#cb181d") + ### if gradient scale should be used
-  scale_fill_viridis(discrete = F, option = "G", direction = -1) +
-  labs(x = "", y = "", fill = "occurences")+
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 60, hjust = 1),
-        panel.grid.major = element_blank())
 
 
 
