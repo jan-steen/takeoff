@@ -63,27 +63,6 @@ habitat$Habitat_type <- factor(habitat$Habitat_type,
 habitat$Habitat_quality_grouped <- factor(habitat$Habitat_quality_grouped,
                                           levels = c("Biomass", "Land Cover", "Species detection","Biogeochemical", "Other","missing"))
 
-##define a color palette
-pal <- c(
-  "Biomass" = "#e41a1c",
-  "Land Cover" = "#377eb8",
-  "Species detection" = "#4daf4a",
-  "Biogeochemical" = "#984ea3",
-  "Other" = "#a9a9a9"
-)
-
-
-### plot which habitat traits were assessed in which habitat type
-hab <- ggplot(habitat[habitat$Habitat_quality_grouped != "missing",],aes(x = Habitat_type, fill = Habitat_quality_grouped))+
-  geom_bar(position = position_dodge2(preserve = "single"))+
-  scale_y_continuous(expand = c(0,0))+
-  theme_classic() +
-  labs(fill = "analysed trait", x = "Habitat type", y = "Number of observations")+
-  scale_fill_manual(values = pal, guide = guide_legend(ncol = 2))+
-  theme(legend.position = "bottom",
-        legend.key.spacing.y = unit(0, "pt"))
-hab
-
 
 ################################################################################
 
@@ -95,14 +74,9 @@ hab
 ### remove rows where both (%) or one (|) parameteres are NA
 ### filter countries that are part of the European Union, UK only until 2020
 
-euro <- data |>
-  select(DOI, Habitat_type, Country_study_area, NATURA_2000) |>
-  filter(!(is.na(Habitat_type)  & is.na(Country_study_area) & is.na(NATURA_2000))) |>
-  group_by(DOI) |> 
-  fill(Habitat_type,.direction = "down") |>
-  fill(NATURA_2000,.direction = "down") |>
-  fill(Country_study_area,.direction = "down") |>
-  ungroup() |>
+europe <- data |>
+  select(DOI, Country_study_area, NATURA_2000) |>
+  filter(!is.na(Country_study_area)) |>
   left_join(meta, by = "DOI") |>
   filter(Country_study_area %in% c("Belgium","Bulgaria","Czechia","Denmark","Estonia",
                                    "Finland","France", "Germany", "Hungary", "Ireland",
@@ -110,6 +84,27 @@ euro <- data |>
                                    "Romania", "Serbia", "Spain", "Sweden")
          | Country_study_area %in% "United Kingdom" & Year < 2020 )
 
+
+
+### new natura 2000 stuff
+
+euro <- data |>
+  select(DOI, Habitat_type, Country_study_area, NATURA_2000, Habitat_quality_grouped, Habitat_quality_lvl2) |>
+  filter(!(is.na(Habitat_type)  & is.na(Country_study_area) & is.na(NATURA_2000) & is.na(Habitat_quality_grouped) & is.na(Habitat_quality_lvl2))) |>
+  group_by(DOI) |> 
+  fill(Habitat_type,.direction = "down") |>
+  fill(NATURA_2000,.direction = "down") |>
+  fill(Country_study_area,.direction = "down") |>
+  fill(Habitat_quality_grouped,.direction = "down") |>
+  fill(Habitat_quality_lvl2,.direction = "down") |>
+  ungroup() |>
+  left_join(meta, by = "DOI") |>
+  filter(Country_study_area %in% c("Belgium","Bulgaria","Czechia","Denmark","Estonia",
+                                   "Finland","France", "Germany", "Hungary", "Ireland",
+                                   "Italy", "Netherlands", "Portugal", "Republic of Serbia",
+                                   "Romania", "Serbia", "Spain", "Sweden")
+         | Country_study_area %in% "United Kingdom" & Year < 2020 ) |>
+  filter(NATURA_2000 == "yes")
 
 ### simplify and sort the habitats
 euro
@@ -121,32 +116,37 @@ euro$Habitat_type <- case_when(
 )
 
 euro$Habitat_type <- factor(euro$Habitat_type, 
-                               levels = c("Grassland", "Wetland", "Heathland", "Other"))
-
-euro$NATURA_2000 <- factor(euro$NATURA_2000,
-                                levels = c("unknown","no", "yes"))
-
-euro$NATURA_2000 <- euro$NATURA_2000 |> replace_na("unknown")
+                            levels = c("Grassland", "Wetland", "Heathland", "Other"))
+euro$Habitat_quality_grouped <- factor(euro$Habitat_quality_grouped,
+                                       levels = c("Biomass", "Land Cover", "Species detection","Biogeochemical", "Other","missing"))
 
 
-pal3 <- c(
-  "no" = "#e41a1c",
-  "yes" = "#377eb8",
-  "unknown" = "#a9a9a9"
-)
+### combine the habitat and euro data frames
 
-###  plot studies in NATURA 2000 habitats
-eur <- ggplot(euro, aes(x = Habitat_type, fill = NATURA_2000))+
-  geom_bar(width = 0.7)+
-  labs(x = "Habitat type", y = "", fill = "NATURA 2000 area")+
-  scale_y_continuous(expand = c(0,0))+
+
+test <- habitat |>
+  filter(Habitat_quality_grouped != "missing" & Habitat_type != "Other") |>
+  left_join(euro, by = "DOI")
+
+
+ggplot(test,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
+  geom_bar(position = position_stack(reverse = T), width = 0.8)+
+  facet_wrap(test$Habitat_type.x)+
+  scale_y_continuous(expand = c(0,0), limits = c(0,110))+
   theme_classic() +
-  scale_fill_manual(values = pal3, guide = guide_legend(ncol = 2, reverse = TRUE))+
-  theme(legend.position = "bottom",
-        legend.key.spacing.y = unit(0, "pt"))
-eur
+  labs(x = "", y = "Number of observations", fill = "NATURA 2000\nhabitat")+
+  theme(legend.position = "right",
+        legend.key.spacing.y = unit(0, "pt"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.background = element_rect(linewidth = 0.5))+
+  theme(panel.spacing = unit(1, "lines"))+
+  scale_fill_manual(
+    values = "indianred1",
+    breaks = c('yes'))
+## traits als facet und dann ihne farben und traits als balken
 
-#ggsave("figures/NATURA2000.pdf", width = 12, height = 6, units = "cm")
+#ggsave("figures/habitats.pdf", width = 18, height = 10, units = "cm")
+
 
 ################################################################################
 ### trying out treemap figures
@@ -186,78 +186,6 @@ treemap(tree,
 )
 
 # 5.92 x 3.92 inches für export
-
-
-
-################################################################################
-
-### die treemap funktioniert nicht als plot objekt...
-hab | eur
-
-#ggsave("figures/habitats.pdf", width = 18, height = 10, units = "cm")
-
-
-
-### new natura 2000 stuff
-
-euro <- data |>
-  select(DOI, Habitat_type, Country_study_area, NATURA_2000, Habitat_quality_grouped, Habitat_quality_lvl2) |>
-  filter(!(is.na(Habitat_type)  & is.na(Country_study_area) & is.na(NATURA_2000) & is.na(Habitat_quality_grouped) & is.na(Habitat_quality_lvl2))) |>
-  group_by(DOI) |> 
-  fill(Habitat_type,.direction = "down") |>
-  fill(NATURA_2000,.direction = "down") |>
-  fill(Country_study_area,.direction = "down") |>
-  fill(Habitat_quality_grouped,.direction = "down") |>
-  fill(Habitat_quality_lvl2,.direction = "down") |>
-  ungroup() |>
-  left_join(meta, by = "DOI") |>
-  filter(Country_study_area %in% c("Belgium","Bulgaria","Czechia","Denmark","Estonia",
-                                   "Finland","France", "Germany", "Hungary", "Ireland",
-                                   "Italy", "Netherlands", "Portugal", "Republic of Serbia",
-                                   "Romania", "Serbia", "Spain", "Sweden")
-         | Country_study_area %in% "United Kingdom" & Year < 2020 ) |>
-  filter(NATURA_2000 == "yes")
-
-### simplify and sort the habitats
-euro
-euro$Habitat_type <- case_when(
-  euro$Habitat_type %in% c("grassland", "desert") ~ "Grassland",
-  euro$Habitat_type == "heathland" ~ "Heathland",
-  euro$Habitat_type %in% c("peatland", "wetland") ~ "Wetland",
-  TRUE ~ "Other"
-)
-
-euro$Habitat_type <- factor(euro$Habitat_type, 
-                               levels = c("Grassland", "Wetland", "Heathland", "Other"))
-euro$Habitat_quality_grouped <- factor(euro$Habitat_quality_grouped,
-                                          levels = c("Biomass", "Land Cover", "Species detection","Biogeochemical", "Other","missing"))
-
-
-### gerade testweise implementiert, code muss noch umgestellt werden um es richtig
-### laufen zu lassen 
-test <- habitat |>
-  filter(Habitat_quality_grouped != "missing" & Habitat_type != "Other") |>
-  left_join(euro, by = "DOI")
-
-
-ggplot(test,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
-  geom_bar(position = position_stack(reverse = T), width = 0.8)+
-  facet_wrap(test$Habitat_type.x)+
-  scale_y_continuous(expand = c(0,0), limits = c(0,110))+
-  theme_classic() +
-  labs(x = "", y = "Number of observations", fill = "NATURA 2000\nhabitat")+
-  theme(legend.position = "right",
-        legend.key.spacing.y = unit(0, "pt"),
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        strip.background = element_rect(linewidth = 0.5))+
-  theme(panel.spacing = unit(1, "lines"))+
-  scale_fill_manual(
-    values = "indianred1",
-    breaks = c('yes'))
-## traits als facet und dann ihne farben und traits als balken
-
-#ggsave("figures/habitats.pdf", width = 18, height = 10, units = "cm")
-
 
 ################################################################################
 
