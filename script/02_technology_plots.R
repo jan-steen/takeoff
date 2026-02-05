@@ -114,7 +114,7 @@ sen <- ggplot(datlin[datlin$Sensor != "missing",], aes(Year, n, color = Sensor))
     hjust = 0, nudge_x = 0.3, size = 3.5
   ) +
   scale_color_manual(values = pal) +
-  scale_x_continuous(breaks = c(2012,2015,2018,2021,2024),expand = expansion(mult = c(0.01, 0.4))) +
+  scale_x_continuous(breaks = c(2012,2015,2018,2021,2024),expand = expansion(mult = c(0.01, 0.42))) +
   scale_y_continuous(expand = c(0,0))+
   theme_classic() +
   theme(legend.position = "none") +
@@ -193,20 +193,32 @@ end_labels <- datlin2 |>
   slice_tail(n = 1) |>
   ungroup()
 ## manually change the text label positions to better fit because text_repel does not work that good
-end_labels$Year <- c(2024, 2018, 2022, 2024, 2022)
-end_labels$n <- c(4,3.5,1,55.5,3)
+#end_labels$Year <- c(2024, 2018, 2022, 2024, 2022)
+#end_labels$n <- c(4,3.5,1,56,3)
+
+end_labels$Year <- c(2024,2024,2024,2024,2024)
+end_labels$n <- c(11,7,0,57.5,3)
+
+# Definiere die Koordinaten für die Startpunkte der Linien
+end_labels$x_start <- c(2024, 2021, 2023.8, 2023.5, 2023)
+end_labels$y_start <- c(4, 1, 0, 56, 1)
 
 #table(data$Drone_type)
-dro <- ggplot(datlin2[datlin2$Drone_type != "missing" & datlin2$n != "0",], aes(Year, n, color = Drone_type)) +
+dro <- ggplot(datlin2[datlin2$Drone_type != "missing" ,], aes(Year, n, color = Drone_type)) +
   geom_line(linewidth = 1.5) +
   geom_text(
     data = end_labels[end_labels$Drone_type != "missing",],
     aes(label = Drone_type),
     hjust = 0, nudge_x = 0.3, size = 3.5
   ) +
+  geom_segment(
+    data = end_labels[end_labels$Drone_type!= c("missing", "Rotor"),],
+    aes(x = x_start, y = y_start, xend = Year + 0.3, yend = n),
+    linetype = "solid"
+  ) +
   scale_color_manual(values = pal2) +
   scale_x_continuous(breaks = c(2012,2015,2018,2021,2024),expand = expansion(mult = c(0.01, 0.35))) +
-  scale_y_continuous(expand = c(0,0))+
+  scale_y_continuous(breaks = c(0,20,40,60) , limits = c(0,61), expand = c(0,0))+
   theme_classic() +
   theme(legend.position = "none") +
   labs(
@@ -222,9 +234,10 @@ dro
 dro / UASbar + plot_layout(heights = c(4,1))
 
 #
-(sen / bar) + plot_layout(heights = c(4,1)) | 
-  (dro / UASbar) + plot_layout(heights = c(4,1))#| 
- # (man / plot_spacer())+ plot_layout(heights = c(4,1))
+test <- (sen / bar) + plot_layout(heights = c(4,1)) | 
+  (dro / UASbar) + plot_layout(heights = c(4,1)) 
+
+test + plot_annotation(tag_levels = list(c("A","","B","")))
 
 #ggsave("figures/tech.pdf", width = 18, height = 10, units = "cm")
 
