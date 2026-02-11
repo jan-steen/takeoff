@@ -76,6 +76,9 @@ ggplot(aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
              nrow = 4)+
   theme_classic()+
   labs(x = "R²", y = "", fill =  "")+
+  scale_x_continuous(breaks = c(0.25,0.5,0.75,1),
+                     limits = c(0,1.1),
+                     expand = c(0,0))+
   theme(axis.line.y = element_blank(), axis.ticks.y = element_blank())+
   theme(strip.background = element_rect(linewidth = 0.5))+
   theme(legend.position = "bottom", 
@@ -96,6 +99,9 @@ ggplot( aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
   facet_wrap(vars(Habitat_quality_grouped), nrow = 2)+
   theme_classic()+
   labs(x = "Accuracy", y = "", fill =  "")+
+  scale_x_continuous(breaks = c(0.25,0.5,0.75,1),
+                     limits = c(0,1.1),
+                     expand = c(0,0)) +
   theme(axis.line.y = element_blank(), axis.ticks.y = element_blank())+
   theme(strip.background = element_rect(linewidth = 0.5))+
   theme(legend.position = "none")
