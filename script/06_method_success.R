@@ -118,12 +118,19 @@ ggplot( aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
   theme(strip.background = element_rect(linewidth = 0.5))
 
 
-r2 | (plot_spacer() / ac) 
 
-#ggsave("figures/methodsuccess.pdf", width = 16, height = 16, units = "cm")
+################################################################################
+## put plots togethre in a single plot
+design <- c(
+  area(1,1,2),
+  area(1,2,1),
+  area(2,2)
+)
+plot(design)
 
+r2 + guide_area() + ac + plot_layout(design = design, 
+                                     guides = "collect", 
+                                     heights = c(1,1.045))
 
-
-
-
+ggsave("figures/methodsuccess.pdf", width = 16, height = 12, units = "cm")
 
