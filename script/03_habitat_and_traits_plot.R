@@ -177,27 +177,27 @@ pal2 =c(
 )
 
 pal2 =c(
-  "Biomass" = "#fff",
-  "Land Cover" = "#fff",
-  "Species detection" = "#fff",
-  "Biogeochemical" = "#fff",
-  "Other" = "#fff",
-  "missing" = "#fff"
+  "Biomass" = "#ffffff",
+  "Land Cover" = "#eeeeee",
+  "Species detection" = "#eeeeee",
+  "Biogeochemical" = "#ffffff",
+  "Other" = "#ffffff",
+  "missing" = "#ffffff"
 )
 
 ## treemap package
 treemap(tree,
         index = c("Habitat_quality_grouped", "Habitat_quality_lvl2"),
         vSize = "n",
-        type = "value",
+        type = "index",
      #   title = "Habitat quality traits assessed with UASs",
         title = "",
         align.labels = list(c("left","top"),c("center","center")),
         algorithm = "squarified",
         fontcolor.labels = "black", 
         palette = pal2,
-        bg.labels = "#fff",
-     position.legend = "none"
+        bg.labels = "transparent",
+        position.legend = "none"
 )
 
 # 5.92 x 3.92 inches für export

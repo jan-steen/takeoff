@@ -147,11 +147,12 @@ ggplot(data = test, aes(x = Sensor, y = algorithm_grouped, fill = n)) +
   scale_fill_viridis(discrete = T, option = "G", direction = -1) +
   labs(x = "", y = "", fill = "Occurences")+
   theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "black"),
+        axis.text.y = element_text(color = "black"),
         panel.grid.major = element_blank(),
         strip.text = element_text(size = 10,face = "bold"),
-        panel.spacing = unit(1, "lines")
-        )
+        panel.spacing = unit(1, "lines"))
+        
 
 
 
