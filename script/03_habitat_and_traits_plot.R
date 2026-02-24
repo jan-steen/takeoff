@@ -134,18 +134,23 @@ ggplot(test,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
   facet_wrap(test$Habitat_type.x)+
   scale_y_continuous(expand = c(0,0), limits = c(0,110))+
   theme_classic() +
-  labs(x = "", y = "Number of observations", fill = "NATURA 2000\nhabitat")+
-  theme(legend.position = "right",
-        legend.key.spacing.y = unit(0, "pt"),
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        strip.background = element_rect(linewidth = 0.5))+
-  theme(panel.spacing = unit(1, "lines"))+
+  labs(x = "", y = "Number of observations", fill = "")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10,face = "bold"))+ ### layout of facet titles
+  theme(panel.spacing = unit(1, "lines"),
+        legend.position = c(0.85,0.85), 
+        legend.key.size = unit(0.7,units = "cm"),
+        legend.text = element_text(size=10.5),
+        panel.background = element_rect(fill = "#eee"),
+        legend.background = element_rect(fill = "#eee"))+
   scale_fill_manual(
     values = "indianred1",
-    breaks = c('yes'))
+    breaks = c('yes'),
+    labels = c("Natura 2000\nhabitat"))
 ## traits als facet und dann ihne farben und traits als balken
 
-#ggsave("figures/habitats.pdf", width = 18, height = 10, units = "cm")
+#ggsave("figures/habitats.pdf", width = 16, height = 10, units = "cm")
 
 
 ################################################################################
@@ -171,18 +176,28 @@ pal2 =c(
   "Other" = "#eaeaea"
 )
 
+pal2 =c(
+  "Biomass" = "#fff",
+  "Land Cover" = "#fff",
+  "Species detection" = "#fff",
+  "Biogeochemical" = "#fff",
+  "Other" = "#fff",
+  "missing" = "#fff"
+)
+
 ## treemap package
 treemap(tree,
         index = c("Habitat_quality_grouped", "Habitat_quality_lvl2"),
         vSize = "n",
-        type = "index",
+        type = "value",
      #   title = "Habitat quality traits assessed with UASs",
-     title = "",
+        title = "",
         align.labels = list(c("left","top"),c("center","center")),
         algorithm = "squarified",
         fontcolor.labels = "black", 
-        palette = pal2
-
+        palette = pal2,
+        bg.labels = "#fff",
+     position.legend = "none"
 )
 
 # 5.92 x 3.92 inches für export

@@ -85,16 +85,24 @@ map <- ggplot(data = world) +
  #   name = "Number of Articles")+
   scale_fill_viridis(discrete = F, option = "G", direction = -1, 
                      na.value = "white",
-                     name = "Number of Articles")+
+                     name = "Number of \nArticles")+
   coord_sf(crs = "ESRI:54030")+
   theme_bw()+
   theme(legend.position = "right",
         legend.margin = margin(0),
-        legend.key.width = unit(0.75, "cm"))
+        legend.key.width = unit(0.75, "cm"),
+        axis.line=element_blank(),axis.text.x=element_blank(),
+        axis.text.y=element_blank(),axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank(),
+        panel.background=element_blank(),
+        panel.border=element_blank(),
+        panel.grid.minor=element_blank(),
+        plot.background=element_blank())
 
 map
 
-#ggsave("figures/map.pdf", width = 18, height = 10, units = "cm")
+ggsave("figures/map.pdf", width = 16, height = 8, units = "cm")
 
 ################################################################################
 

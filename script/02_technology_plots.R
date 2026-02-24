@@ -56,13 +56,16 @@ sensors$Sensor <- factor(sensors$Sensor,
 
 ##define a color palette
 pal <- c(
-  RGB = "#e41a1c",
-  multispectral = "#377eb8",
-  hyperspectral = "#4daf4a",
-  LiDAR = "#984ea3",
+  RGB = "#E16A86",
+  multispectral = "#909800",
+  hyperspectral = "#00AD9A",
+  LiDAR = "#9183E6",
   Other = "#a9a9a9"
 )
-
+#E16A86
+#909800
+#00AD9A
+#9183E6
 
 ################################################################################
 ### barplot with percentages written inside
@@ -76,8 +79,8 @@ bar <- ggplot(datbar, aes(x = "", fill = Sensor)) +
   geom_bar(position = "fill", width = 0.6, color = "white") +
   geom_text(
     stat = "count",
-    aes(label = after_stat(ifelse(count / sum(count) >= 0.13,
-                                  scales::percent(count / sum(count), 0.1), ""))),
+    aes(label = after_stat(ifelse(count / sum(count) >= 0.08,
+                                  scales::percent(count / sum(count), 1), ""))),
     position = position_fill(vjust = 0.5),
     size = 3, col = "white"
   ) +
@@ -107,7 +110,7 @@ datlin$Sensor <- factor(datlin$Sensor,
                            levels = c("RGB", "multispectral", "hyperspectral", "LiDAR", "Other"))
 
 sen <- ggplot(datlin[datlin$Sensor != "missing",], aes(Year, n, color = Sensor)) +
-  geom_line(linewidth = 1.5) +
+  geom_line(linewidth = 1) +
   geom_text(
     data = end_labels[end_labels$Sensor != "missing",],
     aes(label = Sensor),
@@ -139,12 +142,15 @@ sen / bar + plot_layout(heights = c(4,1))
 
 ##define a color palette
 pal2 <- c(
-  Rotor = "#e41a1c",
-  "Fixed Wing" = "#377eb8",
-  Helicopter = "#4daf4a",
-  VTOL = "#984ea3"
+  Rotor = "#E16A86",
+  "Fixed Wing" = "#909800",
+  Helicopter = "#00AD9A",
+  VTOL = "#9183E6"
 )
-
+#E16A86
+#909800
+#00AD9A
+#9183E6
 ################################################################################
 ### barplot with percentages written inside
 
@@ -168,7 +174,7 @@ UASbar <- ggplot(datbar2, aes(x = "", fill = Drone_type)) +
   geom_text(
     stat = "count",
     aes(label = after_stat(ifelse(count / sum(count) >= 0.06,
-                                  scales::percent(count / sum(count), 0.1), ""))),
+                                  scales::percent(count / sum(count), 1), ""))),
     position = position_fill(vjust = 0.5),
     size = 3, col = "white"
   ) +
@@ -196,8 +202,8 @@ end_labels <- datlin2 |>
 #end_labels$Year <- c(2024, 2018, 2022, 2024, 2022)
 #end_labels$n <- c(4,3.5,1,56,3)
 
-end_labels$Year <- c(2024,2024,2024,2024,2024)
-end_labels$n <- c(11,7,0,57.5,3)
+end_labels$Year <- c(2025,2025,2025,2024,2025)
+end_labels$n <- c(13,8,0,57.5,3)
 
 # Definiere die Koordinaten für die Startpunkte der Linien
 end_labels$x_start <- c(2024, 2021, 2023.8, 2023.5, 2023)
@@ -205,7 +211,7 @@ end_labels$y_start <- c(4, 1, 0, 56, 1)
 
 #table(data$Drone_type)
 dro <- ggplot(datlin2[datlin2$Drone_type != "missing" ,], aes(Year, n, color = Drone_type)) +
-  geom_line(linewidth = 1.5) +
+  geom_line(linewidth = 1) +
   geom_text(
     data = end_labels[end_labels$Drone_type != "missing",],
     aes(label = Drone_type),
@@ -234,8 +240,8 @@ dro
 dro / UASbar + plot_layout(heights = c(4,1))
 
 #
-test <- (sen / bar) + plot_layout(heights = c(4,1)) | 
-  (dro / UASbar) + plot_layout(heights = c(4,1)) 
+test <- (sen / bar) + plot_layout(heights = c(4.5,1)) | 
+  (dro / UASbar) + plot_layout(heights = c(4.5,1)) 
 
 test + plot_annotation(tag_levels = list(c("A","","B","")))
 
@@ -268,40 +274,41 @@ data$DJI_model <- factor(data$DJI_model,
 
 ##define a color palette
 pal3 <- c(
-  Phantom = "#e41a1c",
-  Matrice = "#377eb8",
-  Mavic = "#4daf4a",
-  Inspire = "#984ea3",
+  Phantom = "#E16A86",
+  Matrice = "#909800",
+  Mavic = "#00AD9A",
+  Inspire = "#9183E6",
   Other = "#a9a9a9"
 )
-
+#E16A86
+#909800
+#00AD9A
+#9183E6
 man <- ggplot(data[!(is.na(data$drone_grouped)) & data$drone_grouped != "missing",], aes(x= drone_grouped, fill = DJI_model))+
   geom_bar(width = 0.8)+
-  scale_y_continuous(expand = c(0,0))+
+  scale_y_continuous(expand = c(0,0), limits = c(0,240))+
   theme_classic() +
-  #  coord_flip()+
   scale_fill_manual(breaks = c("Phantom", "Matrice", "Mavic", "Inspire", "Other"),
                     values = pal3)+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")+
   guides(
-    fill = guide_legend(
-      #position = "inside", 
-                             title = "DJI model"))+
- # theme(legend.position.inside = c(0.3,0.68))+
-  labs(
-    #title = "UAS Manufacturers",
-     #  subtitle = "data missing = 18",
-       y = "Number of observations", x = "")
+    fill = guide_legend(title = "DJI model"))+
+  labs(#title = "UAS Manufacturers",
+       #subtitle = "data missing = 18",
+       y = "Number of observations", x = "")+
+  annotate("text", x = 2.7, y = 85, label = "Phantom", size = 3.5)+
+  annotate("text", x = 2.5, y = 155, label = "Matrice", size = 3.5)+
+  annotate("text", x = 2.3, y = 178, label = "Mavic", size = 3.5)+
+  annotate("text", x = 2.4, y = 198, label = "Inspire", size = 3.5)+
+  annotate("text", x = 2.8, y = 230, label = "DJI Model", fontface = "bold", size = 3.5)
 man 
 
-#ggsave("figures/manufacturer.pdf", width = 8, height = 8, units = "cm")
+ggsave("figures/manufacturer.pdf", width = 7, height = 8, units = "cm")
+
+
 
 #
-(sen / bar) + plot_layout(heights = c(4,1)) | 
-  (dro / UASbar) + plot_layout(heights = c(4,1))| 
- (man / plot_spacer())+ plot_layout(heights = c(4,1))
-
-
 
 
 

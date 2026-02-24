@@ -118,16 +118,16 @@ test <- combi |>
   mutate(n = cut(n, breaks = c(1,5,10,15,20,50), right = F))
 
 test$n <- case_when(
-  test$n == "[1,5)" ~ "1-4",
-  test$n == "[5,10)" ~ "5-9",
-  test$n == "[10,15)" ~ "10-14",
-  test$n == "[15,20)" ~ "15-19",
+  test$n == "[1,5)" ~ "1 - 4",
+  test$n == "[5,10)" ~ "5 - 9",
+  test$n == "[10,15)" ~ "10 - 14",
+  test$n == "[15,20)" ~ "15 - 19",
   test$n == "[20,50)" ~ "> 20",
   TRUE ~ "other"
 )
 test
 test$n <- factor(test$n,
-                 levels = c("1-4","5-9","10-14","15-19","> 20"))
+                 levels = c("1 - 4","5 - 9","10 - 14","15 - 19","> 20"))
 
 ### define labels with number of observations for the habitat facets
 habitats <- c(
@@ -145,10 +145,13 @@ ggplot(data = test, aes(x = Sensor, y = algorithm_grouped, fill = n)) +
              labeller = labeller(Habitat_quality_grouped = habitats))+
   # scale_fill_gradient(low = "#fef0d9", high = "#cb181d") + ### if gradient scale should be used
   scale_fill_viridis(discrete = T, option = "G", direction = -1) +
-  labs(x = "", y = "", fill = "occurences")+
+  labs(x = "", y = "", fill = "Occurences")+
   theme_minimal()+
-  theme(axis.text.x = element_text(angle = 60, hjust = 1),
-        panel.grid.major = element_blank())
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid.major = element_blank(),
+        strip.text = element_text(size = 10,face = "bold"),
+        panel.spacing = unit(1, "lines")
+        )
 
 
 

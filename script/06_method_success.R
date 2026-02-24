@@ -68,6 +68,22 @@ acc$algorithm_grouped <- factor(acc$algorithm_grouped,
 ## darstellung von NATURA 2000 plots?
 
 
+### define colours
+#E16A86
+#AA9000
+#00AA5A
+#00A6CA
+#B675E0
+
+pal <- c(
+  "parametric statistical analysis" = "#E16A86",
+  "tree based machine learning" = "#909800",
+  "support vector machine" = "#00AD9A",
+  "deep neural network" = "#9183E6",
+  "unsupervised machine learning" = "#B675E0"
+)
+
+
 r2 <- acc |>
   filter(Accuracy_assessment == "R²" & algorithm_grouped != "other" & algorithm_grouped != "missing")|>
 ggplot(aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
@@ -82,7 +98,11 @@ ggplot(aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
   theme(axis.line.y = element_blank(), axis.ticks.y = element_blank())+
   theme(strip.background = element_rect(linewidth = 0.5))+
   theme(legend.position = "bottom", 
-        legend.key.spacing.y = unit(0, "pt"))+
+        legend.key.spacing.y = unit(0, "pt"),
+        panel.background = element_rect(fill = "#eeeeee"),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10,face = "bold"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent"))+
   guides(fill = guide_legend(direction = "vertical"))
 r2
 
@@ -104,18 +124,21 @@ ggplot( aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
                      expand = c(0,0)) +
   theme(axis.line.y = element_blank(), axis.ticks.y = element_blank())+
   theme(strip.background = element_rect(linewidth = 0.5))+
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        panel.background = element_rect(fill = "#eeeeee"),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10,face = "bold"))
 ac
 
-acc |>
-  filter(Accuracy_assessment == "Kappa" & algorithm_grouped != "other" & algorithm_grouped != "missing")|>
-ggplot( aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
-  geom_dotplot(stackdir = "center", alpha = 0.5, dotsize = 0.8)+
-  facet_wrap(vars(Habitat_quality_grouped), nrow=2)+
-  theme_classic()+
-  labs(x = "Kappa", y = "", fill =  "")+
-  theme(axis.line.y = element_blank(), axis.ticks.y = element_blank())+
-  theme(strip.background = element_rect(linewidth = 0.5))
+#acc |>
+#  filter(Accuracy_assessment == "Kappa" & algorithm_grouped != "other" & algorithm_grouped != "missing")|>
+#ggplot( aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
+#  geom_dotplot(stackdir = "center", alpha = 0.5, dotsize = 0.8)+
+#  facet_wrap(vars(Habitat_quality_grouped), nrow=2)+
+#  theme_classic()+
+#  labs(x = "Kappa", y = "", fill =  "")+
+#  theme(axis.line.y = element_blank(), axis.ticks.y = element_blank())+
+#  theme(strip.background = element_rect(linewidth = 0.5))
 
 
 
