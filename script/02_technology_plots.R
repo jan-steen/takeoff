@@ -9,7 +9,7 @@ library(ggrepel)
 
 ################################################################################
 
-### directly read the excel file. no need for two files: 
+### directly read the excel file and select rows for metadata (once per DOI) and other data: 
 excel <- read_excel("data/data_extraction/data_extraction_final.xlsx", skip = 1, na = c("","NA"))
 meta <- excel[,c(2:10,18:20,39:41)]
 data <- excel[,c(2,11:17,21:37)]
@@ -32,8 +32,8 @@ data[,c(2:7,9:13,15:25)] <- data[,c(2:7,9:13,15:25)] |>
 
 ################################################################################
 
-# Erstellung eines ersten Plots für die Verteilung der Jahre und den verwendeten Sensoren
-
+# Creation of an initial plot for the distribution of years and the sensors used
+# new table with only sensor data and merge it through DOI with the metadata
 sensors <- data |>
   select(DOI, Sensor) |>
   filter(!(is.na(Sensor))) |>
@@ -54,7 +54,7 @@ sensors$Sensor <- case_when(
 sensors$Sensor <- factor(sensors$Sensor,
                          levels = c("RGB", "multispectral", "hyperspectral", "LiDAR", "Other", "missing"))
 
-##define a color palette
+##define a color palette (by with cols4all)
 pal <- c(
   RGB = "#E16A86",
   multispectral = "#909800",
@@ -62,19 +62,18 @@ pal <- c(
   LiDAR = "#9183E6",
   Other = "#a9a9a9"
 )
-#E16A86
-#909800
-#00AD9A
-#9183E6
+
 
 ################################################################################
 ### barplot with percentages written inside
-
+# omit missing data for this visualisation
 datbar <- sensors |>
   filter(Sensor %in% c("RGB", "multispectral", "hyperspectral", "LiDAR", "Other")) |>
   filter(Year != "2025")
+# sort factors so they appear in the right order when plotted
 datbar$Sensor <- factor(datbar$Sensor,
                       levels = c( "Other", "LiDAR", "hyperspectral", "multispectral", "RGB"))
+
 bar <- ggplot(datbar, aes(x = "", fill = Sensor)) +
   geom_bar(position = "fill", width = 0.6, color = "white") +
   geom_text(
@@ -91,8 +90,12 @@ bar <- ggplot(datbar, aes(x = "", fill = Sensor)) +
   labs (subtitle = "    Overall usage of sensor types")
 
 bar
-################################################################################
 
+
+
+################################################################################
+### line plot of the sensor use over time (excluding 2025)
+# omit missing data and data from 2025 and count observations per year
 datlin <- sensors |>
   filter(Sensor %in% c("RGB", "multispectral", "hyperspectral", "LiDAR", "Other")) |>
   filter(Sensor %in% names(pal), Year != 2025) |>
@@ -100,15 +103,18 @@ datlin <- sensors |>
   count(Year, Sensor, name = "n") |>
   complete(Year = full_seq(Year, 1), Sensor, fill = list(n = 0))
 
+# define where labels should be plotted next to the end of each line
 end_labels <- datlin |>
   group_by(Sensor) |>
   filter(Year == max(Year[n > 0], default = max(Year))) |>
   slice_tail(n = 1) |>
   ungroup()
 
+# sort the factors
 datlin$Sensor <- factor(datlin$Sensor,
                            levels = c("RGB", "multispectral", "hyperspectral", "LiDAR", "Other"))
 
+# make a ggplot object
 sen <- ggplot(datlin[datlin$Sensor != "missing",], aes(Year, n, color = Sensor)) +
   geom_line(linewidth = 1) +
   geom_text(
@@ -130,7 +136,7 @@ sen <- ggplot(datlin[datlin$Sensor != "missing",], aes(Year, n, color = Sensor))
 
 sen
 
-
+## first combined visualitation to check for errors
 sen / bar + plot_layout(heights = c(4,1))
 
 ################################################################################
@@ -138,7 +144,12 @@ sen / bar + plot_layout(heights = c(4,1))
 
 ################################################################################
 
-### new drone type plots
+### now start the plots for drone type in the same way as the sensor plots
+
+drone <- data |>
+  select(DOI, Drone_type) |>
+  filter(!(is.na(Drone_type))) |>
+  left_join(meta, by = "DOI")
 
 ##define a color palette
 pal2 <- c(
@@ -147,28 +158,20 @@ pal2 <- c(
   Helicopter = "#00AD9A",
   VTOL = "#9183E6"
 )
-#E16A86
-#909800
-#00AD9A
-#9183E6
+
 ################################################################################
-### barplot with percentages written inside
+### barplot with percentages written inside for the use of UAS systems
 
-drone <- data |>
-  select(DOI, Sensor, drone_grouped, Drone_type) |>
-  filter(!(is.na(Sensor) & is.na(drone_grouped))) |>
-  group_by(DOI) |>
-  fill(Sensor,.direction = "down") |> 
-  fill(drone_grouped,.direction = "down") |>
-  fill(Drone_type,.direction = "down") |>
-  left_join(meta, by = "DOI") |>
-  ungroup()
-
+# omit missing data and data from 2025
 datbar2 <- drone |>
   filter(Drone_type%in% c("Rotor", "Fixed Wing", "Helicopter", "VTOL")) |>
   filter(Year != "2025")
+
+# sort the factos
 datbar2$Drone_type <- factor(datbar2$Drone_type,
                     levels = c( "VTOL", "Helicopter", "Fixed Wing", "Rotor"))
+
+# make a ggplot plot object
 UASbar <- ggplot(datbar2, aes(x = "", fill = Drone_type)) +
   geom_bar(position = "fill", width = 0.6, color = "white") +
   geom_text(
@@ -183,8 +186,15 @@ UASbar <- ggplot(datbar2, aes(x = "", fill = Drone_type)) +
   theme_void() +
   theme(legend.position = "none")+
   labs (subtitle = "    Overall usage of UAS types")
+
 UASbar
-######
+
+
+
+################################################################################
+### now start the line plot for the drone system use during time
+
+# count drone type use per year
 
 datlin2 <- drone |>
   filter(Drone_type %in% c("Rotor", "Fixed Wing", "Helicopter", "VTOL")) |>
@@ -193,23 +203,22 @@ datlin2 <- drone |>
   count(Year, Drone_type, name = "n") |>
   complete(Year = full_seq(Year, 1), Drone_type, fill = list(n = 0))
 
+# define label positions for annotating the lines
 end_labels <- datlin2 |>
   group_by(Drone_type) |>
   filter(Year == max(Year[n > 0], default = max(Year))) |>
   slice_tail(n = 1) |>
   ungroup()
+
 ## manually change the text label positions to better fit because text_repel does not work that good
-#end_labels$Year <- c(2024, 2018, 2022, 2024, 2022)
-#end_labels$n <- c(4,3.5,1,56,3)
-
 end_labels$Year <- c(2025,2025,2025,2024,2025)
-end_labels$n <- c(13,8,0,57.5,3)
+end_labels$n <- c(13,8,0,48,3)
 
-# Definiere die Koordinaten für die Startpunkte der Linien
+# Define coordinates for lines connecting end labels to plotted lines
 end_labels$x_start <- c(2024, 2021, 2023.8, 2023.5, 2023)
-end_labels$y_start <- c(4, 1, 0, 56, 1)
+end_labels$y_start <- c(2, 1, 0, 56, 1)
 
-#table(data$Drone_type)
+# create a ggplot plot object
 dro <- ggplot(datlin2[datlin2$Drone_type != "missing" ,], aes(Year, n, color = Drone_type)) +
   geom_line(linewidth = 1) +
   geom_text(
@@ -224,7 +233,7 @@ dro <- ggplot(datlin2[datlin2$Drone_type != "missing" ,], aes(Year, n, color = D
   ) +
   scale_color_manual(values = pal2) +
   scale_x_continuous(breaks = c(2012,2015,2018,2021,2024),expand = expansion(mult = c(0.01, 0.35))) +
-  scale_y_continuous(breaks = c(0,20,40,60) , limits = c(0,61), expand = c(0,0))+
+  scale_y_continuous(breaks = c(0,20,40,60) , limits = c(0,55), expand = c(0,0))+
   theme_classic() +
   theme(legend.position = "none") +
   labs(
@@ -236,31 +245,37 @@ dro <- ggplot(datlin2[datlin2$Drone_type != "missing" ,], aes(Year, n, color = D
 
 dro
 
-
+## first visualisation to check for errors
 dro / UASbar + plot_layout(heights = c(4,1))
 
-#
-test <- (sen / bar) + plot_layout(heights = c(4.5,1)) | 
+# make the final plot layout and write a pdf file
+plots <- (sen / bar) + plot_layout(heights = c(4.5,1)) | 
   (dro / UASbar) + plot_layout(heights = c(4.5,1)) 
 
-test + plot_annotation(tag_levels = list(c("A","","B","")))
+plots + plot_annotation(tag_levels = list(c("A","","B","")))
 
 #ggsave("figures/tech.pdf", width = 18, height = 10, units = "cm")
 
-################################################################################
+
+
+
+
 
 ################################################################################
 
+################################################################################
 
-### plots about used drone platforms and then combined with used sensots
+### plots about used drone platforms and then combined with used sensors
+
+
 table(data$drone_grouped)
+
 ### sort drone factors and combine infrequent groups
 data$drone_grouped <- fct_lump_n(fct_infreq(data$drone_grouped), n = 9) 
 table(data$drone_grouped)
 
 
 ### group the DJI Models together
-### combine other sensor types
 table(data$DJI_model)
 data$DJI_model <- case_when(
   data$DJI_model == "Matrice" ~ "Matrice",
@@ -269,6 +284,8 @@ data$DJI_model <- case_when(
   data$DJI_model == "Inspire" ~ "Inspire",
   data$DJI_model %in% c("Air", "Genie", "S1000", "Spark", "Spirit", "Wind", "Wizard", "Zenmuse") ~ "Other"
 )
+
+# sort the factors
 data$DJI_model <- factor(data$DJI_model,
                          levels = c("Other", "Inspire", "Mavic", "Matrice", "Phantom"))
 
@@ -280,10 +297,8 @@ pal3 <- c(
   Inspire = "#9183E6",
   Other = "#a9a9a9"
 )
-#E16A86
-#909800
-#00AD9A
-#9183E6
+
+## make a ggplot plot
 man <- ggplot(data[!(is.na(data$drone_grouped)) & data$drone_grouped != "missing",], aes(x= drone_grouped, fill = DJI_model))+
   geom_bar(width = 0.8)+
   scale_y_continuous(expand = c(0,0), limits = c(0,240))+
@@ -304,162 +319,8 @@ man <- ggplot(data[!(is.na(data$drone_grouped)) & data$drone_grouped != "missing
   annotate("text", x = 2.8, y = 230, label = "DJI Model", fontface = "bold", size = 3.5)
 man 
 
-ggsave("figures/manufacturer.pdf", width = 7, height = 8, units = "cm")
-
-
-
-#
+#ggsave("figures/manufacturer.pdf", width = 7, height = 8, units = "cm")
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### additional plots
-
-################################################################################
-### vielleicht 2025 hier kürzen, da es das Bild ein bisschen verzerrt
-
-sen <- sensors |>
-  filter(Sensor %in% c("RGB", "multispectral", "hyperspectral", "LiDAR", "Other")) |>
-  filter(Year != "2025") |>
-  ggplot(aes(x=Year, color = Sensor))+
-  geom_line(stat="count", linewidth = 1.5)+
-  scale_color_manual(values = pal)+
-  scale_x_continuous(expand = expansion(mult = c(0.01, 0.12))) + # room for labels on right
-  theme_minimal() +
-  theme(legend.position = "none")+
-  labs(title = "Sensors used in UAS studies", 
-       subtitle = "data missing = 3",
-       y = "number of studies", 
-       x = "Year of Publication")
-sen 
-#ggsave("figures/sensors.pdf", width = 10, height = 6, units = "cm")
-
-################################################################################
-### barplot with percentages of usage
-
-df <- sensors |>
-  filter(Sensor %in% names(pal), Year != 2025) |>
-  count(Sensor, name = "n") |>
-  mutate(p = n / sum(n),
-         Sensor = factor(Sensor, levels = names(pal))) |>
-  arrange(Sensor) |>
-  mutate(y = cumsum(p) - p/2, # center of each segment (along the bar)
-         off_x = if_else(row_number() %% 2 == 0, -0.12, 0.12)) # up/down offset
-
-df$Sensor <- factor(df$Sensor,
-                    levels = c( "Other", "LiDAR", "hyperspectral", "multispectral", "RGB"))
-
-bar <- ggplot(df, aes(x = 1, y = p, fill = Sensor)) +
-  geom_col(width = 0.6, color = "white") +
-  coord_flip(clip = "off") +
-  geom_label(
-    aes(x = 1 + off_x, y = y, label = Sensor),
-    size = 3.25,
-    label.padding = unit(0.25, "lines")
-  ) +
-  scale_fill_manual(values = pal) +
-  theme_void() +
-  theme(legend.position = "none")
-
-sen / bar + plot_layout(heights = c(4,1))
-
-
-################################################################################
-
-
-### Sensor x drone
-
-### remove rows where both (%) or one (|) parameteres are NA
-### group articles by DOI and fill NAs by the variable that sits above 
-### remove observations where all three variables are duplicated
-###  distinct(DOI, Sensor, Habitat_quality_grouped,.keep_all = TRUE)
-### remove rows where both (%) or one (|) parameteres are NA
-### combine with metadata
-
-drone <- data |>
-  select(DOI, Sensor, drone_grouped, Drone_type) |>
-  filter(!(is.na(Sensor) & is.na(drone_grouped))) |>
-  group_by(DOI) |>
-  fill(Sensor,.direction = "down") |> 
-  fill(drone_grouped,.direction = "down") |>
-  fill(Drone_type,.direction = "down") |>
-  left_join(meta, by = "DOI") |>
-  ungroup()
-
-drone$Drone_type <- factor(drone$Drone_type,
-                           levels = c("Rotor", "Fixed Wing", "Helicopter", "VTOL", "missing"))
-
-
-### plot changes in used drone type over time
-typ <- ggplot(drone[drone$Year != "2025",],aes(x=Year, color = Drone_type))+
-  geom_line(stat="count", linewidth = 1.5)+
-  scale_fill_brewer(palette = "Set2")+
-  theme_minimal()
-typ 
-
-#ggsave("figures/dronetype.pdf", width = 10, height = 6, units = "cm")
-
-
-
-
-sen + typ +  man 
-
-#ggsave("figures/tech.pdf", width = 25, height = 6, units = "cm")
-
-
-
-
-
-
-
-
-
-
-################################################################################
-### plot drones and the sensors used with each drone
-ggplot(drone,aes(x = drone_grouped, fill = Sensor))+
-  geom_bar()+
-  theme_minimal()+
-  scale_fill_brewer(palette = "Set2")+
-  coord_flip()+
-  xlab("Drone model grouped")+
-  ylab("")
-
-### Tarot and microdrones occured 5 times
-
-### plot drone type and the sensors used
-drone$Drone_type <- fct_infreq(drone$Drone_type)
-ggplot(drone,aes(x = Drone_type, fill = Sensor))+
-  geom_bar()+
-  theme_minimal()+
-  scale_fill_brewer(palette = "Set2")+
-  coord_flip()+
-  xlab("Drone model grouped")+
-  ylab("")
-
-
-### Anteil an Rotor drohnen an allen Drohnen
-table(data$Drone_type)
-266/(35+5+15+266+2)
-
-### Anteil an DJI Drohnen an allen
-table(data$drone_grouped)
-(12+14+67+26+96)/(4+1+5+12+14+67+26+96+5+4+5+2+35+3+3+19+5+2)

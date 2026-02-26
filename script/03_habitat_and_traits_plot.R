@@ -2,15 +2,13 @@
 
 library(tidyverse)
 library(ggplot2)
-library(crosstable)
 library(readxl)
 library(treemap)
-library(treemapify)
 library(patchwork)
 
 ################################################################################
 
-### directly read the excel file. no need for two files: 
+### directly read the excel file and select rows for metadata (only once per DOI) and other data: 
 excel <- read_excel("data/data_extraction/data_extraction_final.xlsx", skip = 1, na = c("","NA"))
 meta <- excel[,c(2:10,18:20,39:41)]
 data <- excel[,c(2,11:17,21:37)]
@@ -32,9 +30,7 @@ data[,c(2:7,9:13,15:25)] <- data[,c(2:7,9:13,15:25)] |>
 
 
 ################################################################################
-
-### Welche Habitatqualität wird in welchen Habitaten untersucht 
-
+### What kind of habitat quality is analysed in which habitat?
 
 
 ### remove rows where both (%) or one (|) parameteres are NA
@@ -58,6 +54,7 @@ habitat$Habitat_type <- case_when(
   TRUE ~ "Other"
 )
 
+## sort factors for both
 habitat$Habitat_type <- factor(habitat$Habitat_type, 
                                levels = c("Grassland", "Wetland", "Heathland", "Other"))
 habitat$Habitat_quality_grouped <- factor(habitat$Habitat_quality_grouped,
@@ -73,20 +70,6 @@ habitat$Habitat_quality_grouped <- factor(habitat$Habitat_quality_grouped,
 ### remove observations where all three variables are duplicated
 ### remove rows where both (%) or one (|) parameteres are NA
 ### filter countries that are part of the European Union, UK only until 2020
-
-europe <- data |>
-  select(DOI, Country_study_area, NATURA_2000) |>
-  filter(!is.na(Country_study_area)) |>
-  left_join(meta, by = "DOI") |>
-  filter(Country_study_area %in% c("Belgium","Bulgaria","Czechia","Denmark","Estonia",
-                                   "Finland","France", "Germany", "Hungary", "Ireland",
-                                   "Italy", "Netherlands", "Portugal", "Republic of Serbia",
-                                   "Romania", "Serbia", "Spain", "Sweden")
-         | Country_study_area %in% "United Kingdom" & Year < 2020 )
-
-
-
-### new natura 2000 stuff
 
 euro <- data |>
   select(DOI, Habitat_type, Country_study_area, NATURA_2000, Habitat_quality_grouped, Habitat_quality_lvl2) |>
@@ -124,12 +107,12 @@ euro$Habitat_quality_grouped <- factor(euro$Habitat_quality_grouped,
 ### combine the habitat and euro data frames
 
 
-test <- habitat |>
+combi <- habitat |>
   filter(Habitat_quality_grouped != "missing" & Habitat_type != "Other") |>
   left_join(euro, by = "DOI")
 
-
-ggplot(test,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
+### make a combined ggplot plot
+ggplot(combi,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
   geom_bar(position = position_stack(reverse = T), width = 0.8)+
   facet_wrap(test$Habitat_type.x)+
   scale_y_continuous(expand = c(0,0), limits = c(0,110))+
@@ -148,13 +131,14 @@ ggplot(test,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
     values = "indianred1",
     breaks = c('yes'),
     labels = c("Natura 2000\nhabitat"))
-## traits als facet und dann ihne farben und traits als balken
 
+## save the figure as a pdf
 #ggsave("figures/habitats.pdf", width = 16, height = 10, units = "cm")
 
 
 ################################################################################
-### trying out treemap figures
+### make a treemap figure to get a better overview of lvl 2 habitat traits that
+### were assessed in the reviewed studies
 
 
 tree <- data |>
@@ -168,6 +152,7 @@ tree <- data |>
 tree$Habitat_quality_grouped <- factor(tree$Habitat_quality_grouped, 
                                levels = c("Biomass", "Land Cover", "Species detection", "Biogeochemical","Other"))
 
+### coloured or greyscale palettes
 pal2 =c(
   "Biomass" = "#fb8072",
   "Land Cover" = "#80b1d3",
@@ -176,6 +161,7 @@ pal2 =c(
   "Other" = "#eaeaea"
 )
 
+## does not work as intended???
 pal2 =c(
   "Biomass" = "#ffffff",
   "Land Cover" = "#eeeeee",
@@ -185,7 +171,7 @@ pal2 =c(
   "missing" = "#ffffff"
 )
 
-## treemap package
+## plot a treemap figure
 treemap(tree,
         index = c("Habitat_quality_grouped", "Habitat_quality_lvl2"),
         vSize = "n",
@@ -200,11 +186,12 @@ treemap(tree,
         position.legend = "none"
 )
 
+## no ggplot plot object so we have to manually export the image
 # 5.92 x 3.92 inches für export
 
 ################################################################################
 
-### treemap of only NATURA 2000 plots
+### treemap of only NATURA 2000 plots (not used in final publication)
 
 eurotree <- euro |>
   count(Habitat_quality_grouped, Habitat_quality_lvl2) |>

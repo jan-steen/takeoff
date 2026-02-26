@@ -1,5 +1,5 @@
 ################################################################################
-######### install package via github
+######### install package via github and load other packages
 #install.packages("remotes")
 #library(remotes)
 #install_github("elizagrames/litsearchr", ref="main")
@@ -11,7 +11,7 @@ library(ggraph)
 library(synthesisr)
 ################################################################################
 
-### Explanations:
+### Explanations for litsearchR:
 #https://elizagrames.github.io/litsearchr/litsearchr_vignette.html
 
 ################################################################################
@@ -128,13 +128,14 @@ head(searchterms, 20)
 ################################################################################
 
 ### new keywords should be manually evaluated and grouped
+### this step can be repeated unitl a final search string was found
 
 ### groups 
 # 1: drone / UAV as the remote sensing method
 # 2: ecosystem quality assessment (like aboveground biomass)
 # 3: type of Ecosystem (everything (Offenland))
 searchterms <- data.frame(searchterms)
-write.csv2(searchterms, "data/screening/search_terms.csv")
+#write.csv2(searchterms, "data/screening/search_terms.csv")
 
 # manually group terms in the csv file
 grouped_terms <- read.csv("data/screening/search_terms_grouped.csv")
@@ -210,7 +211,7 @@ head(newresults)
 
 newresults <- newresults[,c(1:28)]
 
-write_refs(newresults, file = "data/screening/abstract_screening.bib", format = "bib")
+#write_refs(newresults, file = "data/screening/abstract_screening.bib", format = "bib")
 
 ### has to be imported to zotero and then exported again to be able to load into 
 ### Rayyan 

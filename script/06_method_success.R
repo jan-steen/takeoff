@@ -7,7 +7,7 @@ library(patchwork)
 
 ################################################################################
 
-### directly read the excel file. no need for two files: 
+### directly read the excel file and select rows for metadata (only once per DOI) and other data:
 excel <- read_excel("data/data_extraction/data_extraction_final.xlsx", skip = 1, na = c("","NA"))
 meta <- excel[,c(2:10,18:20,40:43)]
 ### data also with the accuracy values
@@ -30,6 +30,7 @@ data$Accuracy_value <- as.numeric(data$Accuracy_value)
 
 
 ################################################################################
+### create a data frame with accuracy values, habitat traits and algorithms
 
 acc<- data |>
   select(DOI, Accuracy_value,Accuracy_assessment , Habitat_quality_grouped, algorithm_grouped) |>
@@ -53,7 +54,7 @@ acc$algorithm_grouped <- case_when(
   TRUE ~ "other"
 )
 
-
+# sort the factors
 acc$algorithm_grouped <- factor(acc$algorithm_grouped,
                                   levels = c("missing","other",
                                              "parametric statistical analysis",
@@ -63,26 +64,8 @@ acc$algorithm_grouped <- factor(acc$algorithm_grouped,
                                              "unsupervised machine learning"))
 
 
-### trying out plots for accessing R2 values for different habitat traits
-## algorithmen aufräumen wie in anderem Plot
-## darstellung von NATURA 2000 plots?
 
-
-### define colours
-#E16A86
-#AA9000
-#00AA5A
-#00A6CA
-#B675E0
-
-pal <- c(
-  "parametric statistical analysis" = "#E16A86",
-  "tree based machine learning" = "#909800",
-  "support vector machine" = "#00AD9A",
-  "deep neural network" = "#9183E6",
-  "unsupervised machine learning" = "#B675E0"
-)
-
+### first plot for the distribution of reported R2 values
 
 r2 <- acc |>
   filter(Accuracy_assessment == "R²" & algorithm_grouped != "other" & algorithm_grouped != "missing")|>
@@ -106,11 +89,10 @@ ggplot(aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
   guides(fill = guide_legend(direction = "vertical"))
 r2
 
-## adding mean and SE (but applies her for all groups)
- # geom_point(stat="summary", fun.y="mean", size = 2.5) + 
- # geom_errorbar(stat="summary", fun.data="mean_se", fun.args = list(mult = 1.96), width=0) 
 
 
+
+### second plot for the distribution of reported accuracy values
 ac <- acc |>
   filter(Accuracy_assessment == "Accuracy" & algorithm_grouped != "other" & algorithm_grouped != "missing")|>
   filter(Habitat_quality_grouped != "Biomass") |> ## biomass without observations but occured in the plot???
@@ -130,30 +112,20 @@ ggplot( aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
         strip.text = element_text(size = 10,face = "bold"))
 ac
 
-#acc |>
-#  filter(Accuracy_assessment == "Kappa" & algorithm_grouped != "other" & algorithm_grouped != "missing")|>
-#ggplot( aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
-#  geom_dotplot(stackdir = "center", alpha = 0.5, dotsize = 0.8)+
-#  facet_wrap(vars(Habitat_quality_grouped), nrow=2)+
-#  theme_classic()+
-#  labs(x = "Kappa", y = "", fill =  "")+
-#  theme(axis.line.y = element_blank(), axis.ticks.y = element_blank())+
-#  theme(strip.background = element_rect(linewidth = 0.5))
-
-
 
 ################################################################################
-## put plots togethre in a single plot
+## put plots together in a single plot
 design <- c(
   area(1,1,2),
   area(1,2,1),
   area(2,2)
 )
+## did the design work?
 plot(design)
 
 r2 + guide_area() + ac + plot_layout(design = design, 
                                      guides = "collect", 
                                      heights = c(1,1.045))
 
-ggsave("figures/methodsuccess.pdf", width = 16, height = 12, units = "cm")
+#ggsave("figures/methodsuccess.pdf", width = 16, height = 12, units = "cm")
 

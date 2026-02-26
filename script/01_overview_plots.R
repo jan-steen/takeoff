@@ -11,7 +11,7 @@ library(viridis)
 
 ################################################################################
 
-### directly read the excel file. no need for two files: 
+### directly read the excel file and select rows for metadata (only once per DOI) and other data: 
 excel <- read_excel("data/data_extraction/data_extraction_final.xlsx", skip = 1, na = c("","NA"))
 meta <- excel[,c(2:10,18:20,39:41)]
 data <- excel[,c(2,11:17,21:37)]
@@ -20,7 +20,7 @@ data <- excel[,c(2,11:17,21:37)]
 ### delete now empty rows to receive a "true" metadata table for our 272 articles
 meta <- filter(meta, !(is.na(Title)))
 
-### make variables into factors
+### make variables that should be factors into factors
 str(meta)
 meta[,c(2,6,8:14)] <- meta[,c(2,6,8:14)] |>
   mutate_if(sapply(meta[,c(2,6,8:14)], is.character), as.factor)
@@ -35,12 +35,8 @@ data[,c(2:7,9:13,15:25)] <- data[,c(2:7,9:13,15:25)] |>
 ################################################################################
 
 ### Number of published articles per year
-publ <- data |>
-  select (DOI, Protected_area) |>
-  filter(!(is.na(Protected_area))) |>
-  left_join(meta, by = "DOI")
 
-pub <- ggplot(publ[publ$Year!=2025,],aes(x = Year) )+
+pub <- ggplot(meta[meta$Year!=2025,],aes(x = Year) )+
   geom_bar(width = 0.8)+
   scale_x_continuous(breaks = c(2012,2015,2018,2021,2024)) +
   scale_y_continuous(expand = c(0,0))+
@@ -102,57 +98,10 @@ map <- ggplot(data = world) +
 
 map
 
-ggsave("figures/map.pdf", width = 16, height = 8, units = "cm")
+#ggsave("figures/map.pdf", width = 16, height = 8, units = "cm")
 
 ################################################################################
 
 
 ################################################################################
 
-
-
-
-
-
-
-
-
-
-
-
-
-### same again but now with tmap for a different visual style
-
-### tmap contains a "World" object that can be plotted 
-names(World)
-
-### names of countries differ from the other packages names...
-World$name
-table(country_counts$Country_study_area)
-
-### Tanzania, Serbia are different --> change to tmap names
-country_counts <- country_counts |>
-  mutate(Country_study_area = recode(Country_study_area, 
-                                     `Republic of Serbia` = "Serbia",
-                                     `United Republic of Tanzania` = "Tanzania"))
-
-### combine the tmap World with my data
-World <- World
-World <- left_join(World, country_counts,   by = join_by(name == Country_study_area))
-
-tm <- tm_shape(World) +
-  tm_polygons(fill = "count",
-              fill.scale = tm_scale_intervals( label.style = "continuous"),
-              fill.legend = 
-                tm_legend(
-                  title = "Number of Study sites", 
-                  orientation = "landscape", 
-                  width = 40, text.size = 0.7,
-                  frame = F),
-              position = tm_pos_out(pos.h = "center", pos.v = "bottom"))+
-  tm_crs("+proj=eck4")+
-  tm_layout(earth_boundary = TRUE, frame = FALSE)
-tm
-
-### write a pdf file, output scale in inches...
-#tmap_save(tm, filename = "figures/world.pdf", width = 6, height = 4, dpi = 600, scale = 1.2)

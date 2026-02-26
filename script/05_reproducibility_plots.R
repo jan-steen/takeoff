@@ -1,3 +1,7 @@
+### plots developed in this script were only used as a visualisation and not used 
+### in final publication
+
+
 ### load packages
 
 library(tidyverse)
@@ -7,7 +11,7 @@ library(patchwork)
 
 ################################################################################
 
-### directly read the excel file. no need for two files: 
+### directly read the excel file and select rows for metadata (only once per DOI) and other data:
 excel <- read_excel("data/data_extraction/data_extraction_final.xlsx", skip = 1, na = c("","NA"))
 meta <- excel[,c(2:10,18:20,39:42)]
 data <- excel[,c(2,11:17,21:37)]
@@ -30,8 +34,9 @@ data[,c(2:7,9:13,15:25)] <- data[,c(2:7,9:13,15:25)] |>
 
 ################################################################################
 
-
 ### make some small plots for open source and reproducibility
+
+
 
 ### first change the levels of the factors 
 
@@ -49,6 +54,8 @@ meta$Script_available <- factor(meta$Script_available,
 
 meta$model_available<- factor(meta$model_available,
                               levels = c("yes", "no", "not applicable"))
+
+### produce plots
 
 ana <- ggplot(data[!(is.na(data$Analysis_open_source)),], aes(x= Analysis_open_source))+
   geom_bar(width = 0.6)+

@@ -3,14 +3,12 @@
 library(tidyverse)
 library(ggplot2)
 library(readxl)
-library(gridExtra)
-library(grid)
 library(RColorBrewer)
 library(viridis)
 
 ################################################################################
 
-### directly read the excel file. no need for two files: 
+### directly read the excel file and select rows for metadata (only once per DOI) and other data:
 excel <- read_excel("data/data_extraction/data_extraction_final.xlsx", skip = 1, na = c("","NA"))
 meta <- excel[,c(2:10,18:20,39:41)]
 data <- excel[,c(2,11:17,21:37)]
@@ -35,7 +33,7 @@ table(data$algorithm_grouped)
 
 ### heatmaps of algorithm x sensor for all analysed traits (Biomass, land cover etc)
 
-### Als Datensatz dafür brauchen wir:DOI, habitat quality, algorithm grouped und Sensor
+### we need following data:DOI, habitat quality, algorithm grouped and Sensor
 
 combi <- data |>
   select(DOI, Sensor, Habitat_quality_grouped, algorithm_grouped) |>
@@ -66,15 +64,8 @@ combi$Sensor <- factor(combi$Sensor,
 
 
 ### combine algorithm types:
-## ddnn ist tippfehler
-## dlnn zu cnn um es von den "normalen" nn abzugrenzen
-##
-##
+
 table(combi$algorithm_grouped)
-
-## zweite version mit etwas gröberer Gruppierung
-## vor zeile 77 gleich
-
 
 ### rename algorithms
 combi$algorithm_grouped <- case_when(
@@ -87,7 +78,7 @@ combi$algorithm_grouped <- case_when(
   TRUE ~ "other"
 )
 
-
+## sort factors for algorithms and habitat qualities
 combi$algorithm_grouped <- factor(combi$algorithm_grouped,
                                   levels = c("missing","other",
                                              "unsupervised machine learning",
@@ -105,7 +96,8 @@ table(combi$algorithm_grouped)
 
 ######################################################
 
-test <- combi |>
+### create a new dataframe with observations counts for the use of algorithms per sensor
+obs <- combi |>
   select(Habitat_quality_grouped, Sensor, algorithm_grouped) |>
   count(Sensor, algorithm_grouped, Habitat_quality_grouped) |>
   filter(Habitat_quality_grouped %in% c("Biogeochemical", "Biomass", "Land Cover", "Species detection"))  |>
@@ -117,19 +109,21 @@ test <- combi |>
                                   "parametric statistical analysis")) |>
   mutate(n = cut(n, breaks = c(1,5,10,15,20,50), right = F))
 
-test$n <- case_when(
-  test$n == "[1,5)" ~ "1 - 4",
-  test$n == "[5,10)" ~ "5 - 9",
-  test$n == "[10,15)" ~ "10 - 14",
-  test$n == "[15,20)" ~ "15 - 19",
-  test$n == "[20,50)" ~ "> 20",
+## rename number of obersations to prettier names
+obs$n <- case_when(
+  obs$n == "[1,5)" ~ "1 - 4",
+  obs$n == "[5,10)" ~ "5 - 9",
+  obs$n == "[10,15)" ~ "10 - 14",
+  obs$n == "[15,20)" ~ "15 - 19",
+  obs$n == "[20,50)" ~ "> 20",
   TRUE ~ "other"
 )
-test
-test$n <- factor(test$n,
+obs
+obs$n <- factor(obs$n,
                  levels = c("1 - 4","5 - 9","10 - 14","15 - 19","> 20"))
 
 ### define labels with number of observations for the habitat facets
+table(combi$Habitat_quality_grouped)
 habitats <- c(
   "Biomass" = "Biomass\nn = 138",
   "Biogeochemical" = "Biogeochemical\nn = 76",
@@ -137,9 +131,9 @@ habitats <- c(
   "Species detection" = "Species detection\nn = 86"
 )
 
-table(combi$Habitat_quality_grouped)
 
-ggplot(data = test, aes(x = Sensor, y = algorithm_grouped, fill = n)) + 
+### make a ggplot plot
+ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) + 
   geom_tile() +
   facet_wrap(vars(Habitat_quality_grouped), 
              labeller = labeller(Habitat_quality_grouped = habitats))+
