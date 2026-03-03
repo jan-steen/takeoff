@@ -1,1 +1,1 @@
-Figures procuced for the article
+Figures produced for the article
