@@ -114,7 +114,7 @@ combi <- habitat |>
 ### make a combined ggplot plot
 ggplot(combi,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
   geom_bar(position = position_stack(reverse = T), width = 0.8)+
-  facet_wrap(test$Habitat_type.x)+
+  facet_wrap(combi$Habitat_type.x)+
   scale_y_continuous(expand = c(0,0), limits = c(0,110))+
   theme_classic() +
   labs(x = "", y = "Number of observations", fill = "")+

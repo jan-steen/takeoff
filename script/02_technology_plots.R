@@ -315,8 +315,8 @@ man <- ggplot(data[!(is.na(data$drone_grouped)) & data$drone_grouped != "missing
   annotate("text", x = 2.7, y = 85, label = "Phantom", size = 3.5)+
   annotate("text", x = 2.5, y = 155, label = "Matrice", size = 3.5)+
   annotate("text", x = 2.3, y = 178, label = "Mavic", size = 3.5)+
-  annotate("text", x = 2.4, y = 198, label = "Inspire", size = 3.5)+
-  annotate("text", x = 2.8, y = 230, label = "DJI Model", fontface = "bold", size = 3.5)
+  annotate("text", x = 2.4, y = 198, label = "Inspire", size = 3.5)
+ # annotate("text", x = 2.8, y = 230, label = "DJI Model", fontface = "bold", size = 3.5)
 man 
 
 #ggsave("figures/manufacturer.pdf", width = 7, height = 8, units = "cm")
