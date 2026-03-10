@@ -115,12 +115,12 @@ obs$n <- case_when(
   obs$n == "[5,10)" ~ "5 - 9",
   obs$n == "[10,15)" ~ "10 - 14",
   obs$n == "[15,20)" ~ "15 - 19",
-  obs$n == "[20,50)" ~ "> 20",
+  obs$n == "[20,50)" ~ "≥ 20",
   TRUE ~ "other"
 )
 obs
 obs$n <- factor(obs$n,
-                 levels = c("1 - 4","5 - 9","10 - 14","15 - 19","> 20"))
+                 levels = c("1 - 4","5 - 9","10 - 14","15 - 19","≥ 20"))
 
 ### define labels with number of observations for the habitat facets
 table(combi$Habitat_quality_grouped)
