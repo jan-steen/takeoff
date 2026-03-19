@@ -42,8 +42,8 @@ sensors <- data |>
 ### combine other sensor types
 table(data$Sensor)
 sensors$Sensor <- case_when(
-  sensors$Sensor %in% c("hyperspectral", "hyperspectral (panchromatic)") ~ "hyperspectral",
-  sensors$Sensor == "multispectral" ~ "multispectral",
+  sensors$Sensor %in% c("hyperspectral", "hyperspectral (panchromatic)") ~ "Hyperspectral",
+  sensors$Sensor == "multispectral" ~ "Multispectral",
   sensors$Sensor == "LiDAR" ~ "LiDAR",
   sensors$Sensor == "RGB" ~ "RGB",
   sensors$Sensor == "missing" ~ "missing",
@@ -52,13 +52,13 @@ sensors$Sensor <- case_when(
 
 ### sort factors for the plots
 sensors$Sensor <- factor(sensors$Sensor,
-                         levels = c("RGB", "multispectral", "hyperspectral", "LiDAR", "Other", "missing"))
+                         levels = c("RGB", "Multispectral", "Hyperspectral", "LiDAR", "Other", "missing"))
 
 ##define a color palette (by with cols4all)
 pal <- c(
   RGB = "#E16A86",
-  multispectral = "#909800",
-  hyperspectral = "#00AD9A",
+  Multispectral = "#909800",
+  Hyperspectral = "#00AD9A",
   LiDAR = "#9183E6",
   Other = "#a9a9a9"
 )
@@ -68,11 +68,11 @@ pal <- c(
 ### barplot with percentages written inside
 # omit missing data for this visualisation
 datbar <- sensors |>
-  filter(Sensor %in% c("RGB", "multispectral", "hyperspectral", "LiDAR", "Other")) |>
+  filter(Sensor %in% c("RGB", "Multispectral", "Hyperspectral", "LiDAR", "Other")) |>
   filter(Year != "2025")
 # sort factors so they appear in the right order when plotted
 datbar$Sensor <- factor(datbar$Sensor,
-                      levels = c( "Other", "LiDAR", "hyperspectral", "multispectral", "RGB"))
+                      levels = c( "Other", "LiDAR", "Hyperspectral", "Multispectral", "RGB"))
 
 bar <- ggplot(datbar, aes(x = "", fill = Sensor)) +
   geom_bar(position = "fill", width = 0.6, color = "white") +
@@ -97,7 +97,7 @@ bar
 ### line plot of the sensor use over time (excluding 2025)
 # omit missing data and data from 2025 and count observations per year
 datlin <- sensors |>
-  filter(Sensor %in% c("RGB", "multispectral", "hyperspectral", "LiDAR", "Other")) |>
+  filter(Sensor %in% c("RGB", "Multispectral", "Hyperspectral", "LiDAR", "Other")) |>
   filter(Sensor %in% names(pal), Year != 2025) |>
   mutate(Year = as.integer(Year)) |>
   count(Year, Sensor, name = "n") |>
@@ -112,7 +112,7 @@ end_labels <- datlin |>
 
 # sort the factors
 datlin$Sensor <- factor(datlin$Sensor,
-                           levels = c("RGB", "multispectral", "hyperspectral", "LiDAR", "Other"))
+                           levels = c("RGB", "Multispectral", "Hyperspectral", "LiDAR", "Other"))
 
 # make a ggplot object
 sen <- ggplot(datlin[datlin$Sensor != "missing",], aes(Year, n, color = Sensor)) +

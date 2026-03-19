@@ -78,10 +78,10 @@ map <- ggplot(data = world) +
  # scale_fill_gradientn(
  #   colors = c("#ADD8E6", "#03055B"), # light blue to dark blue
  #   na.value = "white",
- #   name = "Number of Articles")+
+ #   name = "Number of articles")+
   scale_fill_viridis(discrete = F, option = "G", direction = -1, 
                      na.value = "white",
-                     name = "Number of \nArticles")+
+                     name = "Number of \narticles")+
   coord_sf(crs = "ESRI:54030")+
   theme_bw()+
   theme(legend.position = "right",
