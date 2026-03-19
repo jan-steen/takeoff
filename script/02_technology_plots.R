@@ -63,6 +63,18 @@ pal <- c(
   Other = "#a9a9a9"
 )
 
+pal <- c(
+  RGB = "#EE8866",
+  Multispectral = "#2CA02C",
+  Hyperspectral = "#88CCEE",
+  LiDAR = "#B07AA1",
+  Other = "#a9a9a9"
+)
+#EE8866
+#2CA02C
+#88CCEE
+#B07AA1
+#E9E9E9
 
 ################################################################################
 ### barplot with percentages written inside
@@ -123,7 +135,7 @@ sen <- ggplot(datlin[datlin$Sensor != "missing",], aes(Year, n, color = Sensor))
     hjust = 0, nudge_x = 0.3, size = 3.5
   ) +
   scale_color_manual(values = pal) +
-  scale_x_continuous(breaks = c(2012,2015,2018,2021,2024),expand = expansion(mult = c(0.01, 0.42))) +
+  scale_x_continuous(breaks = c(2012,2015,2018,2021,2024),expand = expansion(mult = c(0.01, 0.44))) +
   scale_y_continuous(expand = c(0,0))+
   theme_classic() +
   theme(legend.position = "none") +
@@ -158,7 +170,12 @@ pal2 <- c(
   Helicopter = "#00AD9A",
   VTOL = "#9183E6"
 )
-
+pal2 <- c(
+  Rotor = "#EE8866",
+  "Fixed Wing" = "#2CA02C",
+  Helicopter = "#88CCEE",
+  VTOL = "#B07AA1"
+)
 ################################################################################
 ### barplot with percentages written inside for the use of UAS systems
 
@@ -297,7 +314,13 @@ pal3 <- c(
   Inspire = "#9183E6",
   Other = "#a9a9a9"
 )
-
+pal3 <- c(
+  Phantom = "#EE8866",
+  Matrice = "#2CA02C",
+  Mavic = "#88CCEE",
+  Inspire = "#B07AA1",
+  Other = "#a9a9a9"
+)
 ## make a ggplot plot
 man <- ggplot(data[!(is.na(data$drone_grouped)) & data$drone_grouped != "missing",], aes(x= drone_grouped, fill = DJI_model))+
   geom_bar(width = 0.8)+
