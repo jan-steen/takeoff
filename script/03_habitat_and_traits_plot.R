@@ -137,6 +137,36 @@ ggplot(combi,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
 
 
 ################################################################################
+### figure for graphical abstract
+
+
+ggplot(combi,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
+  geom_bar(position = position_stack(reverse = T), width = 0.8)+
+  scale_y_continuous(expand = c(0,0), limits = c(0,140))+
+  theme_classic() +
+  labs(x = "", y = "Number of observations", fill = "")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10,face = "bold"))+ ### layout of facet titles
+  theme(panel.spacing = unit(1, "lines"),
+        legend.position = c(0.69,0.85), 
+        legend.key.size = unit(0.7,units = "cm"),
+        legend.text = element_text(size=10.5),
+        panel.background = element_rect(fill = "#eee"),
+        legend.background = element_rect(fill = "#eee"))+
+  scale_fill_manual(
+    values = "indianred1",
+    breaks = c('yes'),
+    labels = c("Natura 2000\nhabitat"))
+
+
+#ggsave("figures/abstract.pdf", width = 7.5, height = 10, units = "cm" )
+#ggsave("figures/abstract.png", width = 7.5, height = 10, units = "cm" )
+
+
+
+
+################################################################################
 ### make a treemap figure to get a better overview of lvl 2 habitat traits that
 ### were assessed in the reviewed studies
 
