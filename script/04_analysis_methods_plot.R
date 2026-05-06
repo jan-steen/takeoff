@@ -153,8 +153,53 @@ ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) +
 #ggsave("figures/analysis.pdf", width = 16, height = 12, units = "cm")
 
 
+################################################################################
+### additional plot for presentationa
+
+### count observations
+
+### create a new dataframe with observations counts for the use of algorithms per sensor
+obs <- combi |>
+  select(Habitat_quality_grouped, Sensor, algorithm_grouped) |>
+  count(Sensor, algorithm_grouped) |>
+  filter(Sensor %in% c("RGB", "multispectral", "hyperspectral", "LiDAR", "other")) |>
+  filter(algorithm_grouped %in% c("deep neural network",
+                                  "support vector machine",
+                                  "unsupervised machine learning",
+                                  "tree based machine learning",
+                                  "parametric statistical analysis")) |>
+  mutate(n = cut(n, breaks = c(1,5,10,20,50,100), right = F))
+
+## rename number of obersations to prettier names
+obs$n <- case_when(
+  obs$n == "[1,5)" ~ "1 - 4",
+  obs$n == "[5,10)" ~ "5 - 9",
+  obs$n == "[10,20)" ~ "10 - 19",
+  obs$n == "[20,50)" ~ "20 - 49",
+  obs$n == "[50,100)" ~ "≥ 50",
+  TRUE ~ "other"
+)
+obs
+obs$n <- factor(obs$n,
+                levels = c("1 - 4","5 - 9","10 - 19","20 - 49","≥ 50"))
 
 
+
+
+### make a ggplot plot
+ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) + 
+  geom_tile() +
+  # scale_fill_gradient(low = "#fef0d9", high = "#cb181d") + ### if gradient scale should be used
+  scale_fill_viridis(discrete = T, option = "G", direction = -1) +
+  labs(x = "", y = "", fill = "Occurences")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "black"),
+        axis.text.y = element_text(color = "black"),
+        panel.grid.major = element_blank(),
+        strip.text = element_text(size = 10,face = "bold"),
+        panel.spacing = unit(1, "lines"))
+
+#ggsave("figures/analysis_simple.pdf", width = 12, height = 6.5, units = "cm")
 
 
 
