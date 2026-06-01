@@ -151,17 +151,22 @@ ggplot(combi,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
   theme(panel.spacing = unit(1, "lines"),
         legend.position = c(0.69,0.85), 
         legend.key.size = unit(0.7,units = "cm"),
-        legend.text = element_text(size=10.5),
-        panel.background = element_rect(fill = "#eee"),
-        legend.background = element_rect(fill = "#eee"))+
+        legend.text = element_text(size=12),
+        panel.background = element_rect(fill = "#fafafa"),
+        legend.background = element_rect(fill = "#fafafa"),
+        plot.background = element_rect(fill='transparent', color=NA),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12))+
   scale_fill_manual(
     values = "indianred1",
     breaks = c('yes'),
     labels = c("Natura 2000\nhabitat"))
 
 
-#ggsave("figures/abstract.pdf", width = 7.5, height = 10, units = "cm" )
-#ggsave("figures/abstract.png", width = 7.5, height = 10, units = "cm" )
+ggsave("figures/abstract.pdf", width = 7.5, height = 10, units = "cm", bg = "transparent" )
+ggsave("figures/abstract.png", width = 7.5, height = 10, units = "cm" , bg = "transparent" )
 
 
 
