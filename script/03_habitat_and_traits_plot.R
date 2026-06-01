@@ -151,14 +151,14 @@ ggplot(combi,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
   theme(panel.spacing = unit(1, "lines"),
         legend.position = c(0.69,0.85), 
         legend.key.size = unit(0.7,units = "cm"),
-        legend.text = element_text(size=12),
+        legend.text = element_text(size=14),
         panel.background = element_rect(fill = "#fafafa"),
-        legend.background = element_rect(fill = "#fafafa"),
+        legend.background = element_rect(fill = "transparent"),
         plot.background = element_rect(fill='transparent', color=NA),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        axis.text=element_text(size=12),
-        axis.title=element_text(size=12))+
+        axis.text=element_text(size=14),
+        axis.title=element_text(size=14))+
   scale_fill_manual(
     values = "indianred1",
     breaks = c('yes'),
