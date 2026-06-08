@@ -185,22 +185,29 @@ obs$n <- factor(obs$n,
 
 
 
-
+obs$title <- "Habitat type"
 ### make a ggplot plot
 ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) + 
   geom_tile() +
   # scale_fill_gradient(low = "#fef0d9", high = "#cb181d") + ### if gradient scale should be used
   scale_fill_viridis(discrete = T, option = "G", direction = -1) +
-  labs(x = "", y = "", fill = "Occurences")+
+  labs(x = "Sensors", y = "Analysis\nmethods", fill = "Occurences")+
   theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "black"),
-        axis.text.y = element_text(color = "black"),
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
         panel.grid.major = element_blank(),
         strip.text = element_text(size = 10,face = "bold"),
-        panel.spacing = unit(1, "lines"))
+        panel.spacing = unit(1, "lines"),
+        axis.title=element_text(size=14))+
+  theme(legend.position="none")+
+ #ggtitle("Habitat type")+
+  #theme(plot.title = element_text(size = 14, hjust = 0.5))+
+  facet_grid(.~ title)+
+  theme(strip.background = element_rect(fill = "#fafafa"))+
+  theme(strip.text = element_text(size = 14))
 
-#ggsave("figures/analysis_simple.pdf", width = 12, height = 6.5, units = "cm")
-
+ggsave("figures/analysis_simple.pdf", width = 6, height = 6, units = "cm", bg = "transparent")
+ggsave("figures/analysis_simple.png", width = 6, height = 6, units = "cm", bg = "transparent")
 
 
 
