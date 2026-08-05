@@ -203,7 +203,9 @@ ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) +
  #ggtitle("Habitat type")+
   #theme(plot.title = element_text(size = 14, hjust = 0.5))+
   facet_grid(.~ title)+
-  theme(strip.background = element_rect(fill = "#fafafa"))+
+  theme(strip.background = element_rect(fill = "#fafafa"),
+        panel.background = element_rect(fill = "#fafafa"),
+        plot.background = element_rect(fill= "transparent", color=NA))+
   theme(strip.text = element_text(size = 14))
 
 ggsave("figures/analysis_simple.pdf", width = 6, height = 6, units = "cm", bg = "transparent")
