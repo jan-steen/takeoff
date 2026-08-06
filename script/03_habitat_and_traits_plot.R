@@ -165,8 +165,47 @@ ggplot(combi,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
     labels = c("Natura 2000\nhabitat"))
 
 
-ggsave("figures/abstract.pdf", width = 7.5, height = 10, units = "cm", bg = "transparent" )
-ggsave("figures/abstract.png", width = 7.5, height = 10, units = "cm" , bg = "transparent" )
+ggsave("figures/extra_figures/abstract.pdf", width = 7.5, height = 10, units = "cm", bg = "transparent" )
+ggsave("figures/extra_figures/abstract.png", width = 7.5, height = 10, units = "cm" , bg = "transparent" )
+
+
+
+
+
+################################################################################
+
+### poster figures
+
+ggplot(combi,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
+  geom_bar(position = position_stack(reverse = T), width = 0.8)+
+  facet_wrap(combi$Habitat_type.x)+
+  scale_y_continuous(expand = c(0,0), limits = c(0,110))+
+  theme_classic() +
+  labs(x = "", y = "Number of observations", fill = "")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        axis.text.y = element_text(size = 10),
+        strip.background = element_rect(fill = "#fafafa", linewidth = 0.5, colour = "grey90"),
+        strip.text = element_text(size = 11,face = "bold"))+ ### layout of facet titles
+  theme(panel.spacing = unit(1, "lines"),
+        legend.position = c(0.85,0.85), 
+        legend.key.size = unit(0.7,units = "cm"),
+        legend.text = element_text(size=11),
+        panel.background = element_rect(fill = "#fafafa"),
+        panel.border = element_rect(linewidth = 0.5, colour = "grey90"),
+        legend.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill= "transparent", color=NA))+
+  scale_fill_manual(
+    values = "indianred1",
+    breaks = c('yes'),
+    labels = c("Natura 2000\nhabitat"))
+
+ggsave("figures/extra_figures/poster_analysis.png", width = 16, height = 10, units = "cm" , bg = "transparent" )
+
+
+
+
+
+
 
 
 

@@ -208,29 +208,36 @@ ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) +
         plot.background = element_rect(fill= "transparent", color=NA))+
   theme(strip.text = element_text(size = 14))
 
-#ggsave("figures/analysis_simple.pdf", width = 6, height = 6, units = "cm", bg = "transparent")
-#ggsave("figures/analysis_simple.png", width = 6, height = 6, units = "cm", bg = "transparent")
+#ggsave("figures/extra_figures/analysis_simple.pdf", width = 6, height = 6, units = "cm", bg = "transparent")
+#ggsave("figures/extra_figures/analysis_simple.png", width = 6, height = 6, units = "cm", bg = "transparent")
 
 
 ################################################################################
 
 ### plot for scientific poster at GFÖ conference
-obs$title <- ""
+
 ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) + 
   geom_tile() +
+  facet_wrap(vars(Habitat_quality_grouped), 
+             labeller = labeller(Habitat_quality_grouped = habitats))+
+  # scale_fill_gradient(low = "#fef0d9", high = "#cb181d") + ### if gradient scale should be used
   scale_fill_viridis(discrete = T, option = "G", direction = -1) +
   labs(x = "", y = "", fill = "Occurences")+
-  facet_grid(.~ title)+
   theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "black"),
-        axis.text.y = element_text(color = "black"),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "black", size = 10),
+        axis.text.y = element_text(color = "black", size = 10),
         panel.grid.major = element_blank(),
+        strip.text = element_text(size = 10,face = "bold"),
+        panel.spacing = unit(1, "lines"),
+        legend.text = element_text(size=11),
         panel.background = element_rect(fill = "#fafafa"),
+        panel.border = element_rect(linewidth = 0.5, colour = "grey90"), 
+        legend.background = element_rect(fill = "#fafafa", colour = "grey90", linewidth = 0.5),
         plot.background = element_rect(fill= "transparent", color=NA),
-        strip.text = element_text(size = 14))
+        strip.background = element_rect(fill = "#fafafa", linewidth = 0.5, colour = "grey90"))
 
-ggsave("figures/analysis_poster.pdf", width = 11, height = 6, units = "cm", bg = "transparent")
-ggsave("figures/analysis_poster.png", width = 11, height = 6, units = "cm", bg = "transparent")
+
+ggsave("figures/extra_figures/analysis_poster_large.png", width = 16, height = 10, units = "cm", bg = "transparent")
 
 
 
