@@ -208,8 +208,30 @@ ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) +
         plot.background = element_rect(fill= "transparent", color=NA))+
   theme(strip.text = element_text(size = 14))
 
-ggsave("figures/analysis_simple.pdf", width = 6, height = 6, units = "cm", bg = "transparent")
-ggsave("figures/analysis_simple.png", width = 6, height = 6, units = "cm", bg = "transparent")
+#ggsave("figures/analysis_simple.pdf", width = 6, height = 6, units = "cm", bg = "transparent")
+#ggsave("figures/analysis_simple.png", width = 6, height = 6, units = "cm", bg = "transparent")
+
+
+################################################################################
+
+### plot for scientific poster at GFÖ conference
+obs$title <- ""
+ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) + 
+  geom_tile() +
+  scale_fill_viridis(discrete = T, option = "G", direction = -1) +
+  labs(x = "", y = "", fill = "Occurences")+
+  facet_grid(.~ title)+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "black"),
+        axis.text.y = element_text(color = "black"),
+        panel.grid.major = element_blank(),
+        panel.background = element_rect(fill = "#fafafa"),
+        plot.background = element_rect(fill= "transparent", color=NA),
+        strip.text = element_text(size = 14))
+
+ggsave("figures/analysis_poster.pdf", width = 11, height = 6, units = "cm", bg = "transparent")
+ggsave("figures/analysis_poster.png", width = 11, height = 6, units = "cm", bg = "transparent")
+
 
 
 
