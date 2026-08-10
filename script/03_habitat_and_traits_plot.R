@@ -125,8 +125,8 @@ ggplot(combi,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
         legend.position = c(0.85,0.85), 
         legend.key.size = unit(0.7,units = "cm"),
         legend.text = element_text(size=10.5),
-        panel.background = element_rect(fill = "#eee"),
-        legend.background = element_rect(fill = "#eee"))+
+        panel.background = element_rect(fill = "#fafafa"),
+        legend.background = element_rect(fill = "#fafafa"))+
   scale_fill_manual(
     values = "indianred1",
     breaks = c('yes'),

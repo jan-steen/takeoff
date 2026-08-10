@@ -145,12 +145,13 @@ ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) +
         axis.text.y = element_text(color = "black"),
         panel.grid.major = element_blank(),
         strip.text = element_text(size = 10,face = "bold"),
-        panel.spacing = unit(1, "lines"))
+        panel.spacing = unit(1, "lines"),
+        panel.background = element_rect(fill = "#fafafa", colour = "transparent"))
         
 
 
 
-#ggsave("figures/analysis.pdf", width = 16, height = 12, units = "cm")
+ggsave("figures/analysis.pdf", width = 16, height = 12, units = "cm")
 
 
 ################################################################################

@@ -82,7 +82,7 @@ ggplot(aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
   theme(strip.background = element_rect(linewidth = 0.5))+
   theme(legend.position = "bottom", 
         legend.key.spacing.y = unit(0, "pt"),
-        panel.background = element_rect(fill = "#eeeeee"),
+        panel.background = element_rect(fill = "#fafafa"),
         strip.background = element_blank(),
         strip.text = element_text(size = 10,face = "bold"),
         legend.key = element_rect(fill = "transparent", colour = "transparent"))+
@@ -107,7 +107,7 @@ ggplot( aes(x = Accuracy_value, y = "", fill = algorithm_grouped))+
   theme(axis.line.y = element_blank(), axis.ticks.y = element_blank())+
   theme(strip.background = element_rect(linewidth = 0.5))+
   theme(legend.position = "none",
-        panel.background = element_rect(fill = "#eeeeee"),
+        panel.background = element_rect(fill = "#fafafa"),
         strip.background = element_blank(),
         strip.text = element_text(size = 10,face = "bold"))
 ac
