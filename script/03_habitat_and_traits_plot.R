@@ -165,8 +165,8 @@ ggplot(combi,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
     labels = c("Natura 2000\nhabitat"))
 
 
-ggsave("figures/extra_figures/abstract.pdf", width = 7.5, height = 10, units = "cm", bg = "transparent" )
-ggsave("figures/extra_figures/abstract.png", width = 7.5, height = 10, units = "cm" , bg = "transparent" )
+#ggsave("figures/extra_figures/abstract.pdf", width = 7.5, height = 10, units = "cm", bg = "transparent" )
+#ggsave("figures/extra_figures/abstract.png", width = 7.5, height = 10, units = "cm" , bg = "transparent" )
 
 
 
@@ -199,7 +199,7 @@ ggplot(combi,aes(x = Habitat_quality_grouped.x, fill = NATURA_2000))+
     breaks = c('yes'),
     labels = c("Natura 2000\nhabitat"))
 
-ggsave("figures/extra_figures/poster_analysis.png", width = 16, height = 10, units = "cm" , bg = "transparent" )
+ggsave("figures/extra_figures/poster_analysis.png", width = 16, height = 10, units = "cm" , bg = "transparent", dpi = 2500)
 
 
 

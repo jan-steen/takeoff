@@ -151,7 +151,7 @@ ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) +
 
 
 
-ggsave("figures/analysis.pdf", width = 16, height = 12, units = "cm")
+#ggsave("figures/analysis.pdf", width = 16, height = 12, units = "cm")
 
 
 ################################################################################
@@ -238,7 +238,7 @@ ggplot(data = obs, aes(x = Sensor, y = algorithm_grouped, fill = n)) +
         strip.background = element_rect(fill = "#fafafa", linewidth = 0.5, colour = "grey90"))
 
 
-ggsave("figures/extra_figures/analysis_poster_large.png", width = 16, height = 10, units = "cm", bg = "transparent")
+ggsave("figures/extra_figures/analysis_poster_large.png", width = 16, height = 10, units = "cm", bg = "transparent", dpi = 2500)
 
 
 
